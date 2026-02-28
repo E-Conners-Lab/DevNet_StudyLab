@@ -358,9 +358,11 @@ async function seedLabs(objectiveMap: Map<string, number>) {
   for (const file of files) {
     const data = readJson<RawLabFile>(path.join(dir, file));
 
-    let objectiveId = objectiveMap.get(data.objectiveCode);
+    // Labs may have compound objective codes like "5.6/5.8"; use the first code
+    const primaryCode = data.objectiveCode.split("/")[0].trim();
+    let objectiveId = objectiveMap.get(primaryCode);
     if (!objectiveId) {
-      const base = data.objectiveCode.split(".").slice(0, 2).join(".");
+      const base = primaryCode.split(".").slice(0, 2).join(".");
       objectiveId = objectiveMap.get(base);
     }
     if (!objectiveId) {

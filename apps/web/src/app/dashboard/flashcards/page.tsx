@@ -77,10 +77,10 @@ const RATING_CONFIG: Record<
 
 const DOMAIN_TABS = [
   { slug: "all", label: "All Domains", short: "All" },
-  { slug: "software-development-design", label: "1. Software Dev & Design", short: "D1" },
-  { slug: "understanding-using-apis", label: "2. APIs", short: "D2" },
-  { slug: "cisco-platforms-development", label: "3. Cisco Platforms", short: "D3" },
-  { slug: "application-deployment-security", label: "4. App Deploy & Security", short: "D4" },
+  { slug: "software-dev", label: "1. Software Dev & Design", short: "D1" },
+  { slug: "apis", label: "2. APIs", short: "D2" },
+  { slug: "cisco-platforms", label: "3. Cisco Platforms", short: "D3" },
+  { slug: "deployment-security", label: "4. App Deploy & Security", short: "D4" },
   { slug: "infrastructure-automation", label: "5. Infrastructure & Auto", short: "D5" },
   { slug: "network-fundamentals", label: "6. Network Fundamentals", short: "D6" },
 ];
@@ -230,7 +230,11 @@ export default function FlashcardsPage() {
           c.tags.some((t) => t.toLowerCase().includes(q))
       );
     }
-    return cards;
+    // Sort by domain number, then by card ID (natural order within domain)
+    return [...cards].sort((a, b) => {
+      if (a.domain !== b.domain) return a.domain - b.domain;
+      return a.id.localeCompare(b.id, undefined, { numeric: true });
+    });
   }, [flashcards, domainFilter, searchQuery]);
 
   // ---- Due cards count per domain for the filter ----

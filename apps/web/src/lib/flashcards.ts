@@ -109,10 +109,10 @@ export function sm2(
 // ---------------------------------------------------------------------------
 
 const DOMAIN_SLUGS: Record<number, string> = {
-  1: "software-development-design",
-  2: "understanding-using-apis",
-  3: "cisco-platforms-development",
-  4: "application-deployment-security",
+  1: "software-dev",
+  2: "apis",
+  3: "cisco-platforms",
+  4: "deployment-security",
   5: "infrastructure-automation",
   6: "network-fundamentals",
 };

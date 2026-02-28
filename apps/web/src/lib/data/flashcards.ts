@@ -5,7 +5,7 @@
  * DATABASE_URL is not configured or the query fails.
  */
 
-import { eq } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 
 import { isDbConfigured, getDb } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
@@ -78,7 +78,8 @@ async function queryFlashcardsFromDb(
     .innerJoin(
       schema.domains,
       eq(schema.objectives.domainId, schema.domains.id),
-    );
+    )
+    .orderBy(asc(schema.domains.orderIndex), asc(schema.flashcards.id));
 
   const rows = domainSlug
     ? await baseQuery.where(eq(schema.domains.slug, domainSlug))
