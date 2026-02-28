@@ -8,7 +8,7 @@ A full-stack study platform for the **Cisco DevNet Associate (200-901)** certifi
 - **Flashcards** -- SM-2 spaced repetition algorithm with 97 cards across all domains, synced to the database when authenticated
 - **Practice Exams** -- 2 full 40-question practice exams and focused domain quizzes with scoring and attempt history
 - **Study Guides** -- In-depth study guides for all 6 exam domains with objective-level progress tracking
-- **Hands-on Labs** -- Python, REST API, Git, Docker, Bash, Ansible, and NETCONF labs with a code execution engine
+- **Hands-on Labs** -- 7 labs (Python, REST API, Git, Docker, Bash, Ansible, NETCONF) with a CodeMirror editor featuring syntax highlighting, bracket matching, and autocompletion
 - **AI Tutor** -- Claude-powered conversational tutor with domain-specific system prompts
 - **Progress Persistence** -- All study progress saved to PostgreSQL (flashcards, exams, labs, objectives)
 - **Authentication** -- Auth.js v5 with credentials provider and JWT sessions
@@ -17,7 +17,7 @@ A full-stack study platform for the **Cisco DevNet Associate (200-901)** certifi
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | Next.js 16, React 19, TailwindCSS v4, shadcn/ui, Lucide icons |
+| Frontend | Next.js 16, React 19, TailwindCSS v4, shadcn/ui, CodeMirror 6, Lucide icons |
 | Backend | Next.js API Routes, Drizzle ORM |
 | Database | PostgreSQL 16 |
 | Auth | Auth.js v5 (NextAuth 5 beta) |
