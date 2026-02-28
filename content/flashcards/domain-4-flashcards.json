@@ -258,7 +258,7 @@
       "question": "What are IaaS, PaaS, and SaaS cloud service models?",
       "answer": "IaaS (Infrastructure as a Service): Provider manages hardware, networking, storage; you manage OS and apps (e.g., AWS EC2). PaaS (Platform as a Service): Provider also manages OS and runtime; you manage apps and data (e.g., Heroku, Google App Engine). SaaS (Software as a Service): Provider manages everything; you just use the application (e.g., Webex, Salesforce).",
       "explanation": "IaaS gives maximum control but more management burden. PaaS simplifies deployment (just push code). SaaS requires no infrastructure management. The shared responsibility model defines who secures what: in IaaS, you secure the OS and apps; in SaaS, the provider handles nearly all security. Cloud-native applications are designed to take advantage of PaaS features like auto-scaling, managed databases, and serverless functions.",
-      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/computing/what-is-hybrid-cloud.html",
+      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/computing/what-is-cloud-computing.html",
       "difficulty": "easy",
       "tags": ["cloud", "iaas", "paas", "saas"]
     },
@@ -268,7 +268,7 @@
       "question": "What is a hypervisor and what are Type 1 vs Type 2 hypervisors?",
       "answer": "A hypervisor is software that creates and manages virtual machines. Type 1 (bare-metal) runs directly on hardware with no host OS (e.g., VMware ESXi, Microsoft Hyper-V). Type 2 (hosted) runs on top of a host OS (e.g., VirtualBox, VMware Workstation).",
       "explanation": "Type 1 hypervisors are used in data centers and production environments for better performance and security. Type 2 hypervisors are used on developer workstations for local testing. Each VM has its own full OS, kernel, and allocated resources (CPU, RAM, disk). VMs are isolated from each other; a crash in one VM does not affect others. VMs are portable as images (OVA/OVF) but are larger and slower to start than containers.",
-      "sourceUrl": "https://docs.docker.com/get-started/overview/",
+      "sourceUrl": "https://aws.amazon.com/compare/the-difference-between-type-1-and-type-2-hypervisors/",
       "difficulty": "medium",
       "tags": ["hypervisor", "vm", "virtualization", "type1", "type2"]
     },
@@ -388,7 +388,7 @@
       "question": "How do Bash pipes and redirection work?",
       "answer": "Pipe (|) sends the stdout of one command as stdin to another: ls -l | grep '.py'. Redirect output: > overwrites a file, >> appends. Redirect input: < reads from a file. Redirect stderr: 2> error.log. Redirect both: &> all.log.",
       "explanation": "Pipes chain commands: cat access.log | grep '404' | wc -l (count 404 errors). Common patterns: command | sort | uniq -c (count unique occurrences), command | head -20 (first 20 lines), command | tail -f (follow log output). Redirection: echo 'data' > file.txt (overwrite), echo 'more' >> file.txt (append). Here documents: cat << EOF ... EOF for multi-line input. /dev/null discards output: command > /dev/null 2>&1.",
-      "sourceUrl": "https://www.gnu.org/software/bash/manual/bash.html#Redirections",
+      "sourceUrl": "https://www.gnu.org/software/bash/manual/html_node/Redirections.html",
       "difficulty": "medium",
       "tags": ["bash", "pipes", "redirection", "cli"]
     },
@@ -398,7 +398,7 @@
       "question": "How do you use environment variables in Bash and why are they important for application configuration?",
       "answer": "Set: export API_KEY='abc123'. Read: echo $API_KEY. In scripts: use $API_KEY or ${API_KEY}. View all: env or printenv. Environment variables configure applications without hardcoding values, keeping secrets out of source code.",
       "explanation": "The 12-Factor App methodology recommends storing config in environment variables. Common variables: PATH, HOME, USER, SHELL. For applications: DATABASE_URL, API_KEY, DEBUG=true. Set permanently in ~/.bashrc or ~/.bash_profile. In Docker: ENV directive in Dockerfile or -e flag in docker run. In CI/CD: set as pipeline secrets. Use .env files with tools like python-dotenv for local development, but never commit .env files to Git.",
-      "sourceUrl": "https://www.gnu.org/software/bash/manual/bash.html#Environment",
+      "sourceUrl": "https://www.gnu.org/software/bash/manual/html_node/Environment.html",
       "difficulty": "easy",
       "tags": ["bash", "environment-variables", "configuration", "12-factor"]
     },
@@ -438,7 +438,7 @@
       "question": "What is serverless computing and how does it differ from containers?",
       "answer": "Serverless (e.g., AWS Lambda, Azure Functions) runs code in response to events without managing any infrastructure. The provider handles scaling, patching, and availability. Unlike containers, you deploy individual functions, pay only for execution time, and have no idle costs.",
       "explanation": "Serverless advantages: zero infrastructure management, automatic scaling to zero when idle, pay-per-invocation pricing. Limitations: cold start latency, execution time limits (typically 15 minutes), limited runtime customization, and vendor lock-in. Containers offer more control over the runtime environment and are better for long-running processes. Serverless is ideal for event-driven workloads like API backends, file processing, and webhook handlers.",
-      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/computing/what-is-hybrid-cloud.html",
+      "sourceUrl": "https://www.digitalocean.com/resources/articles/serverless-vs-containers",
       "difficulty": "medium",
       "tags": ["serverless", "cloud", "functions", "deployment-models"]
     }

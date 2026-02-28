@@ -98,7 +98,7 @@
       "question": "How do API keys and Bearer tokens differ as authentication mechanisms?",
       "answer": "API keys are static strings typically sent as a query parameter or custom header (e.g., X-API-Key) to identify the calling application. Bearer tokens are dynamic, often obtained via OAuth or login, and sent in the Authorization header ('Authorization: Bearer <token>') to authenticate a specific user session.",
       "explanation": "API keys identify the application/project making the request and are often used for rate limiting and usage tracking. Bearer tokens authenticate a specific user and typically expire after a set time. Bearer tokens are more secure because they are short-lived and can be scoped with specific permissions. Cisco platforms like Catalyst Center use token-based auth where you POST credentials to get a temporary token.",
-      "sourceUrl": "https://developer.cisco.com/docs/dna-center/authentication-and-authorization/",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication",
       "difficulty": "medium",
       "tags": ["authentication", "api-keys", "bearer-token", "oauth"]
     },
@@ -108,7 +108,7 @@
       "question": "What are the key differences between REST and RPC API styles?",
       "answer": "REST is resource-oriented (URLs represent resources, HTTP methods define actions). RPC is action-oriented (URLs represent procedures/functions to call). REST uses standard HTTP methods (GET, POST, PUT, DELETE), while RPC typically uses POST for all operations with the action specified in the request body.",
       "explanation": "REST example: GET /devices/123 retrieves device 123. RPC example: POST /getDevice with body {id: 123}. REST leverages HTTP semantics (methods, status codes, caching), making it more standardized. RPC can be simpler for complex operations that do not map well to CRUD. NETCONF uses RPC-style messaging with XML. gRPC is a modern RPC framework using Protocol Buffers.",
-      "sourceUrl": "https://developer.cisco.com/learning/modules/rest-api-fundamentals/",
+      "sourceUrl": "https://aws.amazon.com/compare/the-difference-between-rpc-and-rest/",
       "difficulty": "medium",
       "tags": ["rest", "rpc", "api-styles", "comparison"]
     },

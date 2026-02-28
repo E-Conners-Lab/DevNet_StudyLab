@@ -127,7 +127,7 @@
         "IOS XE Guest Shell provides a Linux container for running Python scripts directly on the device"
       ],
       "resources": [
-        { "title": "Cisco IOS XE Programmability Guide", "url": "https://developer.cisco.com/docs/ios-xe/" },
+        { "title": "Cisco IOS XE Programmability Guide", "url": "https://developer.cisco.com/iosxe/" },
         { "title": "Cisco NX-OS Programmability Guide", "url": "https://developer.cisco.com/docs/nx-os/" }
       ]
     },

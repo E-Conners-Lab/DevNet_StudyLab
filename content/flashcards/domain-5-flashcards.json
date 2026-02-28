@@ -299,7 +299,7 @@
       "question": "What is a Terraform provider and what is the Terraform workflow?",
       "answer": "A provider is a plugin that lets Terraform manage a specific platform (AWS, Azure, Cisco ACI, Meraki). The workflow: 1) Write HCL config files. 2) 'terraform init' downloads providers. 3) 'terraform plan' shows what will change. 4) 'terraform apply' makes the changes. 5) 'terraform destroy' removes resources.",
       "explanation": "Terraform tracks the current state in a state file (terraform.tfstate). The plan compares desired state (config) with actual state (state file) to determine what actions to take (create, modify, delete). Cisco providers include: CiscoDevNet/aci for ACI, CiscoDevNet/meraki for Meraki, and CiscoDevNet/intersight. Terraform is declarative: you describe what you want, not how to get there. State can be stored remotely (S3, Terraform Cloud) for team collaboration.",
-      "sourceUrl": "https://registry.terraform.io/providers/CiscoDevNet/aci/latest/docs",
+      "sourceUrl": "https://developer.hashicorp.com/terraform/tutorials/aws-get-started/infrastructure-as-code",
       "difficulty": "medium",
       "tags": ["terraform", "provider", "hcl", "workflow"]
     },
@@ -399,7 +399,7 @@
       "question": "A Python script calls GET /restconf/data/Cisco-IOS-XE-native:native/interface on an IOS XE device, parses the JSON response, and writes the results to a CSV file. What workflow is being automated?",
       "answer": "The script automates interface inventory collection from an IOS XE device using RESTCONF. It retrieves all interface configurations via the Cisco native YANG model, then exports the data (interface names, IPs, statuses) to a CSV report.",
       "explanation": "The Cisco-IOS-XE-native:native/interface path returns all interface types (GigabitEthernet, Loopback, Vlan, etc.) with their full configuration. The script likely extracts fields like interface name, IP address, subnet mask, description, and shutdown status. Writing to CSV enables reporting, comparison across devices, or import into inventory management tools. This is a common network documentation/audit automation workflow.",
-      "sourceUrl": "https://developer.cisco.com/docs/ios-xe/",
+      "sourceUrl": "https://developer.cisco.com/iosxe/",
       "difficulty": "medium",
       "tags": ["restconf", "python", "workflow", "ios-xe"]
     },

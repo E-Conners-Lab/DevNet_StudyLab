@@ -22,7 +22,7 @@
       "question": "What is a VLAN and why is it used?",
       "answer": "A VLAN (Virtual Local Area Network) logically segments a physical network into separate broadcast domains. Devices in different VLANs cannot communicate without a Layer 3 device (router or L3 switch). VLANs improve security, reduce broadcast traffic, and simplify network management.",
       "explanation": "Without VLANs, all devices on a switch share one broadcast domain, meaning all broadcasts reach every device. VLANs solve this by creating isolated broadcast domains. VLAN tagging (IEEE 802.1Q) adds a 4-byte tag to Ethernet frames on trunk links to identify which VLAN the frame belongs to. Access ports carry traffic for a single VLAN; trunk ports carry traffic for multiple VLANs. Inter-VLAN routing requires a router or Layer 3 switch.",
-      "sourceUrl": "https://standards.ieee.org/ieee/802.3/10422/",
+      "sourceUrl": "https://documentation.meraki.com/General_Administration/Tools_and_Troubleshooting/Fundamentals_of_802.1Q_VLAN_Tagging",
       "difficulty": "easy",
       "tags": [
         "vlan",
@@ -52,7 +52,7 @@
       "question": "What is the purpose of a default gateway?",
       "answer": "The default gateway is the IP address of the router interface on the local network that a host uses to send packets to destinations outside its own subnet. Without a default gateway, a device can only communicate with other devices on the same local network.",
       "explanation": "When a host wants to send a packet, it compares the destination IP with its own subnet mask. If the destination is on the same subnet, it sends directly (using ARP to find the MAC address). If the destination is on a different subnet, it forwards the packet to the default gateway (router), which then routes it toward the destination. The default gateway must be on the same subnet as the host.",
-      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/networking/what-is-routing.html",
+      "sourceUrl": "https://www.cisco.com/c/en/us/solutions/small-business/resource-center/networking/network-switch-vs-router.html",
       "difficulty": "easy",
       "tags": [
         "gateway",
@@ -349,7 +349,7 @@
       "question": "What is a VPN (Virtual Private Network) and how can it affect application connectivity?",
       "answer": "A VPN creates an encrypted tunnel between two points over a public network (internet), providing secure remote access to private networks. VPNs can affect connectivity by: changing the client's IP address and DNS settings, introducing split-tunnel vs full-tunnel routing decisions, and potentially blocking access to local resources.",
       "explanation": "Full-tunnel VPN routes ALL traffic through the VPN (more secure but slower). Split-tunnel routes only corporate traffic through VPN, allowing direct internet access (better performance). VPN issues: DNS resolution may change (using corporate DNS), applications may not reach internet services through the VPN, and firewall rules at the VPN endpoint may block certain traffic. Common VPN types: IPsec (site-to-site), SSL/TLS VPN (remote access like Cisco AnyConnect).",
-      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/security/what-is-vpn.html",
+      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/security/what-is-a-virtual-private-network-vpn.html",
       "difficulty": "medium",
       "tags": ["vpn", "troubleshooting", "connectivity", "security"]
     },

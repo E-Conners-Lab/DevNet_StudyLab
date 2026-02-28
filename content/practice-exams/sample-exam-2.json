@@ -443,7 +443,7 @@
       ],
       "correctAnswer": "B",
       "explanation": "export sets an environment variable that is available to child processes. $PATH expands to the current PATH value. The = with $PATH:/opt/myapp/bin appends the new directory, separated by a colon. After this command, executables in /opt/myapp/bin can be run without specifying the full path. Without export, the variable would only be available in the current shell.",
-      "sourceUrl": "https://www.gnu.org/software/bash/manual/bash.html#Environment",
+      "sourceUrl": "https://www.gnu.org/software/bash/manual/html_node/Environment.html",
       "difficulty": "medium",
       "tags": [
         "bash",

@@ -629,7 +629,7 @@
         "C"
       ],
       "explanation": "DHCP (Dynamic Host Configuration Protocol) automatically assigns IP addresses. DNS (Domain Name System) resolves domain names to IP addresses. NAT (Network Address Translation) converts private IPs to public IPs for internet access. NTP (Network Time Protocol) ensures all devices have synchronized time, which is critical for logging, authentication, and security.",
-      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Glossary/Protocol",
+      "sourceUrl": "https://datatracker.ietf.org/doc/html/rfc2131",
       "difficulty": "easy",
       "tags": [
         "dhcp",

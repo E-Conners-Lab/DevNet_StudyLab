@@ -88,7 +88,7 @@
       "question": "What are the core principles of Lean software development?",
       "answer": "Lean principles include: eliminate waste, amplify learning, decide as late as possible, deliver as fast as possible, empower the team, build integrity in, and optimize the whole.",
       "explanation": "Lean software development adapts principles from lean manufacturing (Toyota Production System). It focuses on eliminating anything that does not add value to the customer, including unnecessary code, features, documentation, and delays. Key practices include value stream mapping, reducing work-in-progress (WIP), and continuous improvement (kaizen).",
-      "sourceUrl": "https://agilealliance.org/agile101/agile-glossary/",
+      "sourceUrl": "https://en.wikipedia.org/wiki/Lean_software_development",
       "difficulty": "medium",
       "tags": ["lean", "sdlc", "methodology"]
     },
@@ -98,7 +98,7 @@
       "question": "What are three benefits of organizing code into functions and classes?",
       "answer": "1) Reusability: Functions and classes can be called multiple times without duplicating code. 2) Maintainability: Changes only need to be made in one place. 3) Readability: Well-named functions and classes make code self-documenting.",
       "explanation": "Functions encapsulate a specific task, accepting parameters and returning results. Classes group related data (attributes) and behavior (methods) together using object-oriented principles like encapsulation, inheritance, and polymorphism. Modules are Python files that group related functions and classes, enabling import and namespace organization. This separation of concerns makes code easier to test, debug, and extend.",
-      "sourceUrl": "https://docs.python.org/3/tutorial/modules.html",
+      "sourceUrl": "https://docs.python.org/3/tutorial/classes.html",
       "difficulty": "easy",
       "tags": ["functions", "classes", "modules", "code-organization"]
     },

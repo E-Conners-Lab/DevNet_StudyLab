@@ -98,7 +98,7 @@
       "question": "What device-level APIs does IOS XE support?",
       "answer": "IOS XE supports RESTCONF (REST-based, uses YANG models, HTTP/HTTPS on port 443), NETCONF (SSH-based, uses YANG models, port 830), gNMI/gNOI (gRPC-based telemetry and operations), and the traditional CLI. It also supports guest shell for running Python scripts on-box.",
       "explanation": "RESTCONF provides a RESTful interface to YANG-modeled data at https://device/restconf/data/. NETCONF uses XML-encoded RPCs over SSH for configuration management with features like candidate config, commit, rollback, and validation. Both use YANG models (e.g., Cisco-IOS-XE-native, openconfig, ietf) to define the data structure. IOS XE also supports on-box Python scripting via the Guest Shell (a Linux container).",
-      "sourceUrl": "https://developer.cisco.com/docs/ios-xe/",
+      "sourceUrl": "https://developer.cisco.com/iosxe/",
       "difficulty": "medium",
       "tags": ["ios-xe", "restconf", "netconf", "device-apis"]
     },
@@ -168,7 +168,7 @@
       "question": "How do you use the Cisco Catalyst Center Python SDK (dnacentersdk) to get a list of devices?",
       "answer": "Install with pip install dnacentersdk. Create a client: from dnacentersdk import api; dnac = api.DNACenterAPI(base_url='https://sandboxdnac.cisco.com', username='devnetuser', password='Cisco123!'). Get devices: devices = dnac.devices.get_device_list(). The SDK handles token auth automatically.",
       "explanation": "The dnacentersdk wraps all Catalyst Center Intent API endpoints. It automatically obtains and refreshes the authentication token. Methods map to API endpoints: dnac.devices.get_device_list() calls GET /dna/intent/api/v1/network-device. The SDK returns native Python objects with attribute access (device.hostname, device.managementIpAddress). It also supports custom headers, timeouts, and SSL verification settings.",
-      "sourceUrl": "https://developer.cisco.com/docs/dna-center/sdk/",
+      "sourceUrl": "https://developer.cisco.com/docs/dna-center/",
       "difficulty": "medium",
       "tags": ["catalyst-center", "sdk", "python", "dnacentersdk"]
     },
@@ -228,7 +228,7 @@
       "question": "What is Cisco Secure Firewall (Firepower) and what APIs does it expose?",
       "answer": "Cisco Secure Firewall (formerly Firepower) provides next-generation firewall capabilities. It exposes the FMC (Firewall Management Center) REST API for managing security policies, access rules, NAT policies, and intrusion policies. FDM (Firewall Device Manager) API is available for single-device management.",
       "explanation": "FMC API uses token-based authentication: POST /api/fmc_platform/v1/auth/generatetoken with Basic Auth. The FMC manages multiple firewall sensors centrally. Key API resources: /api/fmc_config/v1/domain/{domainUUID}/policy/accesspolicies for access control policies, and /object/networkaddresses for network objects. FDM API is available on devices managed locally (without FMC) and provides a simpler interface for single-device management.",
-      "sourceUrl": "https://developer.cisco.com/docs/secure-firewall/",
+      "sourceUrl": "https://developer.cisco.com/secure-firewall/",
       "difficulty": "hard",
       "tags": ["firepower", "secure-firewall", "fmc", "security"]
     },
@@ -258,7 +258,7 @@
       "question": "How do you enable NETCONF and RESTCONF on a Cisco IOS XE device?",
       "answer": "NETCONF: 'netconf-yang' in global config (listens on port 830 over SSH). RESTCONF: 'restconf' in global config plus 'ip http secure-server' for HTTPS (port 443). Both require AAA authentication to be configured.",
       "explanation": "IOS XE configuration: conf t > netconf-yang > restconf > ip http secure-server > ip http authentication local > username admin privilege 15 secret Cisco123. Verify NETCONF: 'show netconf-yang sessions'. Verify RESTCONF: browse to https://device/restconf/data/. NETCONF uses SSH subsystem, so SSH must be enabled. Both protocols use the same YANG models on the device. Use 'show platform software yang-management process' to verify services are running.",
-      "sourceUrl": "https://developer.cisco.com/docs/ios-xe/",
+      "sourceUrl": "https://developer.cisco.com/iosxe/",
       "difficulty": "medium",
       "tags": ["netconf", "restconf", "ios-xe", "configuration"]
     },
@@ -318,7 +318,7 @@
       "question": "What is Cisco Secure Malware Analytics (formerly Threat Grid) and what does its API provide?",
       "answer": "Secure Malware Analytics is a cloud-based sandboxing platform that analyzes suspicious files and URLs for malware behavior. Its API allows you to submit samples for analysis, retrieve analysis reports, search threat intelligence, and query behavioral indicators.",
       "explanation": "Key API operations: POST /api/v2/samples to submit a file for analysis, GET /api/v2/samples/{id}/analysis to retrieve results, GET /api/v2/search/submissions to search by hash, filename, or other criteria. Analysis results include behavioral indicators, network activity, file system changes, and a threat score. Integration with Cisco Secure Endpoint allows automatic submission of suspicious files for deeper analysis.",
-      "sourceUrl": "https://developer.cisco.com/docs/threat-grid/",
+      "sourceUrl": "https://developer.cisco.com/threat-grid/",
       "difficulty": "hard",
       "tags": ["threat-grid", "malware-analytics", "sandboxing", "security"]
     },
