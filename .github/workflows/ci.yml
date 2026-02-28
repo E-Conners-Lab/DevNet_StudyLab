@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --prefix apps/web
+      - run: npm run lint --prefix apps/web
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --prefix apps/web
+      - run: npm test --prefix apps/web
+        env:
+          DATABASE_URL: ""
+          AUTH_SECRET: ci-test-secret
+
+  content-validation:
+    name: Content Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci && npm ci --prefix apps/web
+      - run: npm run test:content --prefix apps/web
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [lint, unit-tests, content-validation]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --prefix apps/web
+      - run: npm run build --prefix apps/web
+        env:
+          DATABASE_URL: ""
+          AUTH_SECRET: ci-build-secret
+
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: [build]
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: studylab
+          POSTGRES_PASSWORD: studylab_ci
+          POSTGRES_DB: studylab
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U studylab"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci --prefix apps/web
+      - run: npx playwright install --with-deps chromium
+        working-directory: apps/web
+      - run: npm run db:generate --prefix apps/web
+        env:
+          DATABASE_URL: postgresql://studylab:studylab_ci@localhost:5432/studylab
+      - run: npm run db:migrate --prefix apps/web
+        env:
+          DATABASE_URL: postgresql://studylab:studylab_ci@localhost:5432/studylab
+      - run: npm run db:seed --prefix apps/web
+        env:
+          DATABASE_URL: postgresql://studylab:studylab_ci@localhost:5432/studylab
+      - run: npm run test:e2e --prefix apps/web
+        env:
+          DATABASE_URL: postgresql://studylab:studylab_ci@localhost:5432/studylab
+          AUTH_SECRET: ci-e2e-secret
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/web/playwright-report/
+          retention-days: 7
