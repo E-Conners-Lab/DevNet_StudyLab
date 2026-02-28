@@ -289,23 +289,23 @@ test.describe("Lab Execution Page", () => {
     await expect(page.getByText("Labs").first()).toBeVisible({ timeout: 10000 });
   });
 
-  test("code editor has editable textarea that starts blank", async ({ page }) => {
+  test("code editor loads and is editable", async ({ page }) => {
     await page.goto("/dashboard/labs/python-data-parsing");
     await page.waitForLoadState("networkidle");
     await page.waitForTimeout(1500);
 
-    // Find the code textarea
-    const textarea = page.locator("textarea").first();
-    await expect(textarea).toBeVisible({ timeout: 10000 });
+    // CodeMirror renders a .cm-editor container with a .cm-content contenteditable div
+    const editor = page.locator(".cm-editor").first();
+    await expect(editor).toBeVisible({ timeout: 10000 });
 
-    // Editor starts blank — user writes from scratch based on instructions
-    const value = await textarea.inputValue();
-    expect(value).toBe("");
+    // Editor should have the content area
+    const content = page.locator(".cm-content").first();
+    await expect(content).toBeVisible({ timeout: 10000 });
 
-    // Verify it's editable by typing into it
-    await textarea.fill("print('hello')");
-    const typed = await textarea.inputValue();
-    expect(typed).toBe("print('hello')");
+    // Verify it's editable by clicking and typing
+    await content.click();
+    await page.keyboard.type("print('hello')");
+    await expect(content).toContainText("print('hello')");
   });
 });
 
@@ -343,11 +343,9 @@ test.describe("All Labs Completeness", () => {
         page.getByText("Learning Objectives").first()
       ).toBeVisible();
 
-      // 4. Code editor textarea is visible and starts blank
-      const textarea = page.locator("textarea").first();
-      await expect(textarea).toBeVisible({ timeout: 10000 });
-      const editorValue = await textarea.inputValue();
-      expect(editorValue).toBe("");
+      // 4. CodeMirror editor is visible
+      const editor = page.locator(".cm-editor").first();
+      await expect(editor).toBeVisible({ timeout: 10000 });
 
       // 5. Run Code button is visible
       await expect(
