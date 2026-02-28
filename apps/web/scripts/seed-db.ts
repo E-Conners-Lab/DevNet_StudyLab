@@ -11,7 +11,7 @@ import fs from "fs";
 import path from "path";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
-import { eq, sql } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 import * as schema from "../src/lib/db/schema";

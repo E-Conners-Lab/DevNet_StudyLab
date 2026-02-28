@@ -143,9 +143,12 @@ export default function TutorPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Sync messages to active conversation
+  // Sync messages to active conversation. setState in an effect is
+  // intentional here — conversations must stay in sync with the chat
+  // hook's message state which is the source of truth.
   useEffect(() => {
     if (activeConversationId && messages.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setConversations((prev) =>
         prev.map((c) =>
           c.id === activeConversationId

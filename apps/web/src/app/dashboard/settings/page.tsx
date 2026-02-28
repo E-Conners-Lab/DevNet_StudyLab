@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useSession, signOut } from "next-auth/react";
 import {
   Card,
@@ -59,11 +59,10 @@ function savePrefs(prefs: Preferences) {
 
 export default function SettingsPage() {
   const { data: session } = useSession();
-  const [prefs, setPrefs] = useState<Preferences>(defaultPrefs);
-
-  useEffect(() => {
-    setPrefs(loadPrefs());
-  }, []);
+  const [prefs, setPrefs] = useState<Preferences>(() => {
+    if (typeof window !== "undefined") return loadPrefs();
+    return defaultPrefs;
+  });
 
   const userName = session?.user?.name ?? "Student";
   const userEmail = session?.user?.email ?? "student@devnet.lab";

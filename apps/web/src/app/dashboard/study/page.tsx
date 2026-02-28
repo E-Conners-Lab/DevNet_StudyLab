@@ -18,7 +18,6 @@ import {
   CheckCircle2,
   Circle,
   FlaskConical,
-  ExternalLink,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 

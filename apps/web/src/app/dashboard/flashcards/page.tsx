@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { StatsCard } from "@/components/dashboard/stats-card";
 import {
@@ -26,7 +26,6 @@ import {
   Search,
   BookOpen,
   Trophy,
-  Zap,
   ExternalLink,
   Keyboard,
   X,
@@ -34,10 +33,7 @@ import {
   ChevronUp,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  useFlashcards,
-  type Flashcard,
-} from "@/hooks/use-flashcards";
+import { useFlashcards } from "@/hooks/use-flashcards";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -157,6 +153,7 @@ export default function FlashcardsPage() {
 
   // Reset flip when card changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsFlipped(false);
   }, [reviewIndex]);
 

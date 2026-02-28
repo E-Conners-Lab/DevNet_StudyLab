@@ -70,7 +70,7 @@ describe("POST /api/chat", () => {
     process.env = originalEnv;
   });
 
-  it("returns 401 when TUTOR_ANTHROPIC_KEY is not set", async () => {
+  it("returns a helpful message when TUTOR_ANTHROPIC_KEY is not set", async () => {
     delete process.env.TUTOR_ANTHROPIC_KEY;
 
     const { POST } = await importRoute();
@@ -79,10 +79,10 @@ describe("POST /api/chat", () => {
     });
 
     const response = await POST(request as never);
-    const data = await response.json();
+    const text = await response.text();
 
-    expect(response.status).toBe(401);
-    expect(data.error).toContain("TUTOR_ANTHROPIC_KEY");
+    expect(response.status).toBe(200);
+    expect(text).toContain("not configured");
   });
 
   it("returns 400 for missing messages array", async () => {

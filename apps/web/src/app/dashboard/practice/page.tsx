@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import {
   Select,
@@ -29,7 +28,6 @@ import {
   BarChart3,
   Calendar,
   CheckCircle2,
-  XCircle,
   ArrowUpRight,
   Filter,
 } from "lucide-react";

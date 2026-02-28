@@ -6,7 +6,7 @@
  * can fall back to hardcoded defaults.
  */
 
-import { eq, desc, sql, count, max } from "drizzle-orm";
+import { eq, desc, count, max } from "drizzle-orm";
 import { isDbConfigured, getDb } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 
@@ -94,8 +94,7 @@ export async function getDashboardStats(
 
     const completedMap = new Map(completedObjectives.map((r) => [r.domainId, r.count]));
 
-    // 4. Flashcards due (nextReview <= now)
-    const now = new Date();
+    // 4. Flashcards due
     const flashcardsDue = await db
       .select({
         domainId: schema.domains.id,

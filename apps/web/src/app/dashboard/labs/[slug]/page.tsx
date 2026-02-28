@@ -173,7 +173,6 @@ export default function LabExecutionPage() {
   const [showSolution, setShowSolution] = useState(false);
   const [solutionData, setSolutionData] = useState<LabSolution | null>(null);
   const [hintsRevealed, setHintsRevealed] = useState(0);
-  const [hasRun, setHasRun] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [runSuccess, setRunSuccess] = useState<boolean | null>(null);
@@ -219,7 +218,7 @@ export default function LabExecutionPage() {
     setOutput("");
     setRunSuccess(null);
     setExecutionTime(null);
-    setHasRun(true);
+    // run completed
 
     try {
       const res = await fetch(`/api/labs/${slug}/run`, {

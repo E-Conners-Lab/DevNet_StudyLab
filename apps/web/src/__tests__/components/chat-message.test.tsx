@@ -43,6 +43,7 @@ vi.mock("radix-ui", () => ({
       </div>
     ),
     Image: (props: Record<string, unknown>) => (
+      // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
       <img data-testid="avatar-image" {...props} />
     ),
     Fallback: ({ children, ...props }: { children: React.ReactNode }) => (

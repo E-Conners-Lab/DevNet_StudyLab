@@ -187,7 +187,6 @@ const statusConfig: Record<
 
 export default function LabsPage() {
   const router = useRouter();
-  const [activeCategory, setActiveCategory] = useState<LabCategory>("all");
   const [labStatuses, setLabStatuses] = useState<Record<string, LabStatus>>({});
 
   // Fetch lab completion statuses from API (DB overrides hardcoded defaults)
@@ -217,11 +216,6 @@ export default function LabsPage() {
     ...lab,
     status: labStatuses[lab.id] ?? lab.status,
   }));
-
-  const filteredLabs =
-    activeCategory === "all"
-      ? labsWithStatus
-      : labsWithStatus.filter((lab) => lab.category === activeCategory);
 
   const completedCount = labsWithStatus.filter((l) => l.status === "completed").length;
   const inProgressCount = labsWithStatus.filter((l) => l.status === "in_progress").length;
@@ -257,7 +251,6 @@ export default function LabsPage() {
       {/* Filter Tabs */}
       <Tabs
         defaultValue="all"
-        onValueChange={(v) => setActiveCategory(v as LabCategory)}
       >
         <TabsList className="bg-zinc-900 border border-zinc-800 flex-wrap h-auto gap-1 p-1">
           {categories.map((cat) => (
