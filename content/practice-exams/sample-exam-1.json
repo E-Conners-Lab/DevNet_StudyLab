@@ -629,7 +629,7 @@
         "C"
       ],
       "explanation": "DHCP (Dynamic Host Configuration Protocol) automatically assigns IP addresses. DNS (Domain Name System) resolves domain names to IP addresses. NAT (Network Address Translation) converts private IPs to public IPs for internet access. NTP (Network Time Protocol) ensures all devices have synchronized time, which is critical for logging, authentication, and security.",
-      "sourceUrl": "https://www.cloudflare.com/learning/network-layer/what-is-a-protocol/",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Glossary/Protocol",
       "difficulty": "easy",
       "tags": [
         "dhcp",
@@ -740,7 +740,7 @@
       ],
       "correctAnswer": "B",
       "explanation": "Since ping (ICMP) succeeds, basic IP connectivity and routing are working, which rules out default gateway misconfiguration and NAT translation issues. The problem is specific to TCP port 443 (HTTPS). A firewall between the client and server is likely blocking TCP 443 while allowing ICMP. DNS is not the issue because the developer is using an IP address directly, not a hostname. Common troubleshooting steps include: checking firewall rules, using telnet or nc to test port reachability, and reviewing ACLs on intermediate network devices.",
-      "sourceUrl": "https://www.cloudflare.com/learning/network-layer/what-is-a-computer-port/",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Glossary/Port",
       "difficulty": "medium",
       "tags": [
         "troubleshooting",
@@ -826,7 +826,7 @@
       ],
       "correctAnswer": "B",
       "explanation": "With a /16 prefix length (subnet mask 255.255.0.0), the network portion is the first two octets. The network is 10.0.0.0/16, covering all addresses from 10.0.0.0 to 10.0.255.255. Only 10.0.255.254 falls within this range. 10.1.50.1 has a different second octet (10.1.x.x network). 172.16.50.1 and 192.168.50.1 are entirely different private address ranges.",
-      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/networking/what-is-subnet.html",
+      "sourceUrl": "https://www.cisco.com/c/en/us/support/docs/ip/routing-information-protocol-rip/13790-8.html",
       "difficulty": "medium",
       "tags": [
         "ip-addressing",
@@ -847,7 +847,7 @@
       ],
       "correctAnswer": "C",
       "explanation": "A Wireless Access Point bridges wireless clients to the wired LAN infrastructure, converting 802.11 (Wi-Fi) frames to Ethernet frames. Enterprise APs are often managed by a Wireless LAN Controller (WLC) for centralized configuration and monitoring. Routers forward traffic between networks at Layer 3. Switches forward Ethernet frames within a wired network. Firewalls filter traffic based on security policies.",
-      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/networking/what-is-wireless-access-point.html",
+      "sourceUrl": "https://www.cisco.com/site/us/en/learn/topics/small-business/what-is-an-access-point.html",
       "difficulty": "easy",
       "tags": [
         "wireless",

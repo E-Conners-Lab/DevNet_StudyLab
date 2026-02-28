@@ -22,7 +22,7 @@
       "question": "What is a VLAN and why is it used?",
       "answer": "A VLAN (Virtual Local Area Network) logically segments a physical network into separate broadcast domains. Devices in different VLANs cannot communicate without a Layer 3 device (router or L3 switch). VLANs improve security, reduce broadcast traffic, and simplify network management.",
       "explanation": "Without VLANs, all devices on a switch share one broadcast domain, meaning all broadcasts reach every device. VLANs solve this by creating isolated broadcast domains. VLAN tagging (IEEE 802.1Q) adds a 4-byte tag to Ethernet frames on trunk links to identify which VLAN the frame belongs to. Access ports carry traffic for a single VLAN; trunk ports carry traffic for multiple VLANs. Inter-VLAN routing requires a router or Layer 3 switch.",
-      "sourceUrl": "https://ieeexplore.ieee.org/document/10004498/",
+      "sourceUrl": "https://standards.ieee.org/ieee/802.3/10422/",
       "difficulty": "easy",
       "tags": [
         "vlan",
@@ -158,7 +158,7 @@
       "question": "How would you diagnose an application connectivity issue caused by a blocked transport port?",
       "answer": "1) Verify the application's required port using documentation. 2) Test connectivity with telnet <ip> <port> or nc -zv <ip> <port>. 3) Check firewall rules and ACLs along the path. 4) Use traceroute to identify where traffic is being dropped. 5) Check if the service is listening on the correct port (netstat -tlnp or ss -tlnp).",
       "explanation": "A blocked port results in connection timeouts or 'connection refused' errors. Common scenarios: a firewall blocks the required port, the application is listening on a different port than expected, a security group (cloud) does not allow inbound traffic, or the service is not running. Tools: telnet (TCP connectivity test), curl (HTTP-level test), nmap (port scanning), tcpdump/Wireshark (packet capture).",
-      "sourceUrl": "https://www.cloudflare.com/learning/network-layer/what-is-a-computer-port/",
+      "sourceUrl": "https://developer.mozilla.org/en-US/docs/Glossary/Port",
       "difficulty": "medium",
       "tags": [
         "troubleshooting",
