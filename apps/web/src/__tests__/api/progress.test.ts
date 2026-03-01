@@ -13,7 +13,7 @@ const mockDelete = vi.fn();
 
 // Chainable query builder mock
 function makeChainable(resultFn: () => unknown) {
-  const chain: Record<string, unknown> = {};
+  const chain: Record<string | symbol, unknown> = {};
   const methods = [
     "select", "from", "where", "orderBy", "limit", "innerJoin",
     "groupBy", "values", "set", "returning",

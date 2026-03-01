@@ -1,8 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { sm2 } from "@/lib/flashcards";
 import type { FlashcardProgress } from "@/lib/flashcards";
 import { getCurrentUserId } from "@/lib/auth-helpers";
 import { getFlashcardProgress, upsertFlashcardProgress } from "@/lib/data";
+import { jsonOk, jsonBadRequest, jsonError } from "@/lib/api-helpers";
 
 /**
  * GET /api/flashcards/progress
@@ -15,10 +16,10 @@ export async function GET() {
   try {
     const userId = await getCurrentUserId();
     const progress = await getFlashcardProgress(userId);
-    return NextResponse.json({ progress });
+    return jsonOk({ progress });
   } catch (error) {
     console.error("Error loading flashcard progress:", error);
-    return NextResponse.json({ progress: {} });
+    return jsonOk({ progress: {} });
   }
 }
 
@@ -39,17 +40,11 @@ export async function POST(request: NextRequest) {
     };
 
     if (!flashcardId || quality === undefined || quality === null) {
-      return NextResponse.json(
-        { error: "flashcardId and quality are required" },
-        { status: 400 },
-      );
+      return jsonBadRequest("flashcardId and quality are required");
     }
 
     if (quality < 0 || quality > 5) {
-      return NextResponse.json(
-        { error: "quality must be between 0 and 5" },
-        { status: 400 },
-      );
+      return jsonBadRequest("quality must be between 0 and 5");
     }
 
     // Use existing progress or defaults for a new card
@@ -84,12 +79,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ progress: updatedProgress });
+    return jsonOk({ progress: updatedProgress });
   } catch (error) {
     console.error("Error computing progress:", error);
-    return NextResponse.json(
-      { error: "Failed to compute progress" },
-      { status: 500 },
-    );
+    return jsonError("Failed to compute progress");
   }
 }

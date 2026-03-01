@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { gradeExam, saveExamAttempt } from "@/lib/data";
 import { getCurrentUserId } from "@/lib/auth-helpers";
+import { jsonOk, jsonBadRequest, jsonNotFound, jsonError } from "@/lib/api-helpers";
 
 export async function POST(
   request: NextRequest,
@@ -17,19 +18,13 @@ export async function POST(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON in request body" },
-        { status: 400 },
-      );
+      return jsonBadRequest("Invalid JSON in request body");
     }
 
     const { answers, timeTaken } = body;
 
     if (!answers || typeof answers !== "object") {
-      return NextResponse.json(
-        { error: '"answers" object is required' },
-        { status: 400 },
-      );
+      return jsonBadRequest('"answers" object is required');
     }
 
     // Default timeTaken to 0 if not provided
@@ -38,10 +33,7 @@ export async function POST(
     const result = gradeExam(examId, answers, resolvedTimeTaken, domainFilter);
 
     if (!result) {
-      return NextResponse.json(
-        { error: `Exam "${examId}" not found` },
-        { status: 404 },
-      );
+      return jsonNotFound(`Exam "${examId}"`);
     }
 
     // Fire-and-forget: persist the attempt to DB if user is authenticated
@@ -62,12 +54,9 @@ export async function POST(
       );
     }
 
-    return NextResponse.json(result);
+    return jsonOk(result);
   } catch (error) {
     console.error("Error grading exam:", error);
-    return NextResponse.json(
-      { error: "Failed to grade exam" },
-      { status: 500 },
-    );
+    return jsonError("Failed to grade exam");
   }
 }

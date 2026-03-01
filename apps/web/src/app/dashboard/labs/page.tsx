@@ -27,6 +27,7 @@ import {
   Zap,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getDifficultyClasses } from "@/lib/ui-constants";
 
 type LabStatus = "not_started" | "in_progress" | "completed";
 type LabDifficulty = "beginner" | "intermediate" | "advanced";
@@ -159,9 +160,9 @@ const categories: { value: LabCategory; label: string }[] = [
 ];
 
 const difficultyColors: Record<LabDifficulty, string> = {
-  beginner: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  advanced: "bg-red-500/10 text-red-400 border-red-500/20",
+  beginner: getDifficultyClasses("beginner"),
+  intermediate: getDifficultyClasses("intermediate"),
+  advanced: getDifficultyClasses("advanced"),
 };
 
 const statusConfig: Record<

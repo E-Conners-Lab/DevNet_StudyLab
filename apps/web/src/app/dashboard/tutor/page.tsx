@@ -1,11 +1,15 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import {
+  DEVNET_DOMAINS,
+  getDomainBySlug,
+  domainSlugToNumber,
+  domainNumberToSlug,
+} from "@/lib/domains";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,103 +18,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { ChatMessage } from "@/components/tutor/chat-message";
 import { TypingIndicator } from "@/components/tutor/typing-indicator";
+import { TutorSidebar } from "@/components/tutor/tutor-sidebar";
+import { QuickPrompts } from "@/components/tutor/quick-prompts";
+import { ChatInput } from "@/components/tutor/chat-input";
+import type { Conversation } from "@/components/tutor/types";
 import { useChat, type ChatMessage as ChatMessageType } from "@/hooks/use-chat";
 import {
-  Plus,
-  Send,
   ChevronDown,
   MessageSquare,
   Bot,
   Sparkles,
-  Trash2,
-  Clock,
-  Search,
   X,
 } from "lucide-react";
 
-// ---------- Domain data ----------
-
-interface Domain {
-  slug: string;
-  shortName: string;
-  fullName: string;
-  number: number;
-}
-
-const domains: Domain[] = [
-  { slug: "software-dev", shortName: "Software Dev", fullName: "Software Development & Design", number: 1 },
-  { slug: "apis", shortName: "APIs", fullName: "Understanding & Using APIs", number: 2 },
-  { slug: "cisco-platforms", shortName: "Cisco Platforms", fullName: "Cisco Platforms & Development", number: 3 },
-  { slug: "deployment-security", shortName: "Deployment", fullName: "Application Deployment & Security", number: 4 },
-  { slug: "infrastructure-automation", shortName: "Infrastructure", fullName: "Infrastructure & Automation", number: 5 },
-  { slug: "network-fundamentals", shortName: "Networking", fullName: "Network Fundamentals", number: 6 },
-];
-
-// ---------- Quick prompts ----------
-
-const quickPrompts = [
-  {
-    text: "Explain REST API authentication methods",
-    domain: "apis",
-  },
-  {
-    text: "What's the difference between NETCONF and RESTCONF?",
-    domain: "infrastructure-automation",
-  },
-  {
-    text: "Help me understand Docker containers vs VMs",
-    domain: "deployment-security",
-  },
-  {
-    text: "Quiz me on Cisco Meraki API endpoints",
-    domain: "cisco-platforms",
-  },
-  {
-    text: "Explain the MVC design pattern with a Python example",
-    domain: "software-dev",
-  },
-  {
-    text: "What are the key OWASP threats I need to know?",
-    domain: "deployment-security",
-  },
-];
-
-// ---------- Conversation history type ----------
-
-interface Conversation {
-  id: string;
-  title: string;
-  domain: string | null;
-  messages: ChatMessageType[];
-  timestamp: Date;
-}
-
 // ---------- Helpers ----------
-
-function getDomainBySlug(slug: string | null): Domain | undefined {
-  if (!slug) return undefined;
-  return domains.find((d) => d.slug === slug);
-}
-
-function domainSlugToId(slug: string | null): number | null {
-  if (!slug) return null;
-  const d = domains.find((dm) => dm.slug === slug);
-  return d ? d.number : null;
-}
-
-function domainIdToSlug(id: number | null): string | null {
-  if (id == null) return null;
-  const d = domains.find((dm) => dm.number === id);
-  return d ? d.slug : null;
-}
 
 function generateConversationTitle(messages: ChatMessageType[]): string {
   const firstUserMsg = messages.find((m) => m.role === "user");
@@ -129,7 +52,7 @@ async function apiCreateConversation(
     const res = await fetch("/api/tutor/conversations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, domainId: domainSlugToId(domainSlug) }),
+      body: JSON.stringify({ title, domainId: domainSlugToNumber(domainSlug) }),
     });
     const data = await res.json();
     return data.id ?? null;
@@ -191,12 +114,10 @@ export default function TutorPage() {
 
   // Input state
   const [input, setInput] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Track the conversation ID that a pending message-save should target.
-  // This avoids race conditions when conversation creation is async.
   const pendingConvIdRef = useRef<string | null>(null);
 
   // Load conversations from DB on mount
@@ -212,7 +133,7 @@ export default function TutorPage() {
           (c: { id: string; title: string | null; domainId: number | null; updatedAt: string }) => ({
             id: c.id,
             title: c.title ?? "Untitled",
-            domain: domainIdToSlug(c.domainId),
+            domain: domainNumberToSlug(c.domainId),
             messages: [] as ChatMessageType[],
             timestamp: new Date(c.updatedAt),
           }),
@@ -225,24 +146,12 @@ export default function TutorPage() {
     return () => { cancelled = true; };
   }, []);
 
-  // Auto-resize textarea
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      const scrollHeight = textareaRef.current.scrollHeight;
-      const maxHeight = 5 * 24; // ~5 lines
-      textareaRef.current.style.height = `${Math.min(scrollHeight, maxHeight)}px`;
-    }
-  }, [input]);
-
   // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
 
-  // Sync messages to active conversation. setState in an effect is
-  // intentional here — conversations must stay in sync with the chat
-  // hook's message state which is the source of truth.
+  // Sync messages to active conversation
   useEffect(() => {
     if (activeConversationId && messages.length > 0) {
       const title = generateConversationTitle(messages);
@@ -250,13 +159,7 @@ export default function TutorPage() {
       setConversations((prev) =>
         prev.map((c) =>
           c.id === activeConversationId
-            ? {
-                ...c,
-                messages,
-                title,
-                domain: selectedDomain,
-                timestamp: new Date(),
-              }
+            ? { ...c, messages, title, domain: selectedDomain, timestamp: new Date() }
             : c
         )
       );
@@ -271,9 +174,7 @@ export default function TutorPage() {
     let convId = activeConversationId;
     const title = trimmed.length > 50 ? trimmed.slice(0, 50) + "..." : trimmed;
 
-    // If no active conversation, create one
     if (!convId) {
-      // Create in DB (async) — use a temporary local ID while waiting
       const tempId = `temp-${Date.now()}`;
       const newConv: Conversation = {
         id: tempId,
@@ -286,7 +187,6 @@ export default function TutorPage() {
       setActiveConversationId(tempId);
       convId = tempId;
 
-      // Create in DB and replace temp ID with real UUID
       apiCreateConversation(title, selectedDomain).then((dbId) => {
         if (dbId) {
           pendingConvIdRef.current = dbId;
@@ -303,8 +203,6 @@ export default function TutorPage() {
     const isFirstMessage = messages.length === 0;
     const assistantContent = await sendMessage(trimmed);
 
-    // After sendMessage completes, persist messages to DB.
-    // The real DB conversation ID might have arrived by now via pendingConvIdRef.
     const realConvId = pendingConvIdRef.current || convId;
     if (realConvId && !realConvId.startsWith("temp-")) {
       apiSaveMessage(realConvId, "user", trimmed);
@@ -318,14 +216,6 @@ export default function TutorPage() {
 
     pendingConvIdRef.current = null;
   }, [input, isLoading, activeConversationId, selectedDomain, sendMessage, messages.length]);
-
-  // Handle keyboard
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
 
   // New chat
   const handleNewChat = useCallback(() => {
@@ -342,13 +232,11 @@ export default function TutorPage() {
       setActiveConversationId(conv.id);
       setSelectedDomain(conv.domain);
 
-      // If we already have messages cached locally, restore them
       if (conv.messages.length > 0) {
         restoreMessages(conv.messages);
         return;
       }
 
-      // Otherwise fetch from DB
       try {
         const res = await fetch(`/api/tutor/conversations/${conv.id}`);
         if (!res.ok) {
@@ -365,7 +253,6 @@ export default function TutorPage() {
           }),
         );
 
-        // Cache in local state
         setConversations((prev) =>
           prev.map((c) => (c.id === conv.id ? { ...c, messages: dbMessages } : c))
         );
@@ -387,7 +274,6 @@ export default function TutorPage() {
         clearMessages();
         setActiveConversationId(null);
       }
-      // Delete from DB (fire-and-forget)
       if (!id.startsWith("temp-")) {
         apiDeleteConversation(id);
       }
@@ -400,21 +286,16 @@ export default function TutorPage() {
     (prompt: string, domain: string) => {
       setSelectedDomain(domain);
       setInput(prompt);
-      // Focus the textarea so user can just hit enter or edit
-      setTimeout(() => textareaRef.current?.focus(), 100);
     },
     []
   );
 
-  // Get display messages: if we have an active conversation with stored messages and
-  // the hook messages are empty, show stored ones
   const activeConversation = conversations.find((c) => c.id === activeConversationId);
   const displayMessages =
     messages.length > 0
       ? messages
       : activeConversation?.messages || [];
 
-  // Filtered conversations
   const filteredConversations = filterDomain
     ? conversations.filter((c) => c.domain === filterDomain)
     : conversations;
@@ -426,7 +307,7 @@ export default function TutorPage() {
       {/* ===== LEFT SIDEBAR: Conversation History ===== */}
       {/* Desktop sidebar */}
       <div className="hidden lg:flex lg:w-80 flex-col border-r border-zinc-800 bg-zinc-900/50">
-        <SidebarContent
+        <TutorSidebar
           conversations={filteredConversations}
           activeConversationId={activeConversationId}
           filterDomain={filterDomain}
@@ -456,7 +337,7 @@ export default function TutorPage() {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <SidebarContent
+            <TutorSidebar
               conversations={filteredConversations}
               activeConversationId={activeConversationId}
               filterDomain={filterDomain}
@@ -538,7 +419,7 @@ export default function TutorPage() {
                 All Domains
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-zinc-700" />
-              {domains.map((d) => (
+              {DEVNET_DOMAINS.map((d) => (
                 <DropdownMenuItem
                   key={d.slug}
                   onClick={() => setSelectedDomain(d.slug)}
@@ -551,7 +432,7 @@ export default function TutorPage() {
                   <span className="text-emerald-400 font-mono text-xs mr-2 w-5">
                     D{d.number}
                   </span>
-                  {d.fullName}
+                  {d.name}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -565,48 +446,7 @@ export default function TutorPage() {
         >
           <div className="px-4 py-6 space-y-6">
             {displayMessages.length === 0 && !isLoading ? (
-              /* Empty state: Quick prompts */
-              <div className="flex flex-col items-center justify-center h-full min-h-[50vh] gap-8">
-                <div className="text-center space-y-3">
-                  <div className="flex h-14 w-14 mx-auto items-center justify-center rounded-2xl bg-emerald-500/10">
-                    <Bot className="h-7 w-7 text-emerald-500" />
-                  </div>
-                  <h2 className="text-lg font-semibold text-zinc-200">
-                    DevNet AI Tutor
-                  </h2>
-                  <p className="text-sm text-zinc-500 max-w-md">
-                    Ask me anything about the Cisco DevNet Associate 200-901 exam.
-                    I can explain concepts, provide code examples, and quiz you.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-2xl w-full">
-                  {quickPrompts.map((prompt, i) => {
-                    const domain = getDomainBySlug(prompt.domain);
-                    return (
-                      <button
-                        key={i}
-                        onClick={() =>
-                          handleQuickPrompt(prompt.text, prompt.domain)
-                        }
-                        className="group flex flex-col gap-2 rounded-xl border border-zinc-800 bg-zinc-900/50 p-4 text-left transition-all hover:border-emerald-500/30 hover:bg-zinc-800/50"
-                      >
-                        <span className="text-sm text-zinc-300 group-hover:text-zinc-100 leading-snug">
-                          {prompt.text}
-                        </span>
-                        {domain && (
-                          <Badge
-                            variant="secondary"
-                            className="w-fit bg-zinc-800 text-zinc-500 text-[10px] group-hover:bg-emerald-500/10 group-hover:text-emerald-400"
-                          >
-                            D{domain.number} {domain.shortName}
-                          </Badge>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+              <QuickPrompts onSelect={handleQuickPrompt} />
             ) : (
               <>
                 {displayMessages.map((msg) => (
@@ -635,238 +475,14 @@ export default function TutorPage() {
         )}
 
         {/* Input area */}
-        <div className="border-t border-zinc-800 bg-zinc-900/30 p-4">
-          <div className="flex items-end gap-3 max-w-3xl mx-auto">
-            <div className="flex-1 relative">
-              {currentDomain && (
-                <div className="absolute left-3 top-2">
-                  <Badge
-                    variant="secondary"
-                    className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] py-0"
-                  >
-                    D{currentDomain.number}
-                  </Badge>
-                </div>
-              )}
-              <textarea
-                ref={textareaRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Ask about DevNet topics..."
-                rows={1}
-                className={cn(
-                  "w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800/50 text-sm text-zinc-100 placeholder:text-zinc-500",
-                  "focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50",
-                  "px-4 py-3 leading-6 max-h-[120px] overflow-y-auto",
-                  currentDomain && "pt-8"
-                )}
-              />
-            </div>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={handleSend}
-                    disabled={!input.trim() || isLoading}
-                    size="icon"
-                    className={cn(
-                      "shrink-0 rounded-xl transition-all",
-                      input.trim() && !isLoading
-                        ? "bg-emerald-600 hover:bg-emerald-500 text-white"
-                        : "bg-zinc-800 text-zinc-500"
-                    )}
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Send message (Enter)</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          <p className="text-[11px] text-zinc-600 text-center mt-2">
-            Enter to send &middot; Shift+Enter for new line
-          </p>
-        </div>
+        <ChatInput
+          input={input}
+          onInputChange={setInput}
+          onSend={handleSend}
+          isLoading={isLoading}
+          currentDomain={currentDomain}
+        />
       </div>
     </div>
   );
-}
-
-// ---------- Sidebar content (shared between desktop and mobile) ----------
-
-interface SidebarContentProps {
-  conversations: Conversation[];
-  activeConversationId: string | null;
-  filterDomain: string | null;
-  onFilterDomain: (domain: string | null) => void;
-  onNewChat: () => void;
-  onSelectConversation: (conv: Conversation) => void;
-  onDeleteConversation: (id: string, e: React.MouseEvent) => void;
-}
-
-function SidebarContent({
-  conversations,
-  activeConversationId,
-  filterDomain,
-  onFilterDomain,
-  onNewChat,
-  onSelectConversation,
-  onDeleteConversation,
-}: SidebarContentProps) {
-  return (
-    <>
-      {/* New Chat button */}
-      <div className="p-3">
-        <Button
-          onClick={onNewChat}
-          className="w-full gap-2 bg-emerald-600 hover:bg-emerald-500 text-white"
-          size="sm"
-        >
-          <Plus className="h-4 w-4" />
-          New Chat
-        </Button>
-      </div>
-
-      <Separator className="bg-zinc-800" />
-
-      {/* Domain filter */}
-      <div className="px-3 py-2">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="w-full justify-between text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/60"
-            >
-              <span className="flex items-center gap-2">
-                <Search className="h-3.5 w-3.5" />
-                {filterDomain
-                  ? getDomainBySlug(filterDomain)?.shortName || "Filter"
-                  : "All Domains"}
-              </span>
-              <ChevronDown className="h-3.5 w-3.5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="start"
-            className="w-56 bg-zinc-900 border-zinc-700"
-          >
-            <DropdownMenuItem
-              onClick={() => onFilterDomain(null)}
-              className={cn(
-                "cursor-pointer",
-                !filterDomain && "bg-emerald-500/10 text-emerald-400"
-              )}
-            >
-              All Domains
-            </DropdownMenuItem>
-            <DropdownMenuSeparator className="bg-zinc-700" />
-            {domains.map((d) => (
-              <DropdownMenuItem
-                key={d.slug}
-                onClick={() => onFilterDomain(d.slug)}
-                className={cn(
-                  "cursor-pointer",
-                  filterDomain === d.slug &&
-                    "bg-emerald-500/10 text-emerald-400"
-                )}
-              >
-                <span className="text-emerald-400 font-mono text-xs mr-2">
-                  D{d.number}
-                </span>
-                {d.shortName}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <Separator className="bg-zinc-800" />
-
-      {/* Conversation list */}
-      <ScrollArea className="flex-1">
-        <div className="p-2 space-y-1">
-          {conversations.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
-              <MessageSquare className="h-8 w-8 text-zinc-700 mb-3" />
-              <p className="text-sm text-zinc-500">No conversations yet</p>
-              <p className="text-xs text-zinc-600 mt-1">
-                Start a new chat to begin studying
-              </p>
-            </div>
-          ) : (
-            conversations.map((conv) => {
-              const domain = getDomainBySlug(conv.domain);
-              const isActive = conv.id === activeConversationId;
-
-              return (
-                <div
-                  key={conv.id}
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => onSelectConversation(conv)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      onSelectConversation(conv);
-                    }
-                  }}
-                  className={cn(
-                    "group w-full flex items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-all cursor-pointer",
-                    isActive
-                      ? "bg-emerald-500/10 text-emerald-400"
-                      : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
-                  )}
-                >
-                  <MessageSquare className="h-4 w-4 mt-0.5 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{conv.title}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      {domain && (
-                        <Badge
-                          variant="secondary"
-                          className="bg-zinc-800 text-zinc-500 text-[10px] py-0 px-1.5"
-                        >
-                          D{domain.number}
-                        </Badge>
-                      )}
-                      <span className="flex items-center gap-1 text-[10px] text-zinc-600">
-                        <Clock className="h-2.5 w-2.5" />
-                        {formatTimestamp(conv.timestamp)}
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={(e) => onDeleteConversation(conv.id, e)}
-                    className="opacity-0 group-hover:opacity-100 shrink-0 p-1 rounded hover:bg-zinc-700/50 transition-opacity"
-                  >
-                    <Trash2 className="h-3.5 w-3.5 text-zinc-500 hover:text-red-400" />
-                  </button>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </ScrollArea>
-    </>
-  );
-}
-
-// ---------- Timestamp formatting ----------
-
-function formatTimestamp(date: Date): string {
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const minutes = Math.floor(diff / 60_000);
-  const hours = Math.floor(diff / 3_600_000);
-  const days = Math.floor(diff / 86_400_000);
-
-  if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
-  return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }

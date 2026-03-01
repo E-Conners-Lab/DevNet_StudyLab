@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-helpers";
 import { getStudyProgress, saveStudyObjective } from "@/lib/data";
+import { jsonOk, jsonBadRequest, jsonError } from "@/lib/api-helpers";
 
 /**
  * GET /api/study/progress
@@ -12,10 +13,10 @@ export async function GET() {
   try {
     const userId = await getCurrentUserId();
     const completed = await getStudyProgress(userId);
-    return NextResponse.json({ completed });
+    return jsonOk({ completed });
   } catch (error) {
     console.error("Error loading study progress:", error);
-    return NextResponse.json({ completed: [] });
+    return jsonOk({ completed: [] });
   }
 }
 
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
     const userId = await getCurrentUserId();
     if (!userId) {
       // No user — silently succeed (client-side state still works)
-      return NextResponse.json({ ok: true });
+      return jsonOk({ ok: true });
     }
 
     const body = await request.json();
@@ -40,19 +41,13 @@ export async function POST(request: NextRequest) {
     };
 
     if (!objectiveCode || typeof completed !== "boolean") {
-      return NextResponse.json(
-        { error: "objectiveCode (string) and completed (boolean) are required" },
-        { status: 400 },
-      );
+      return jsonBadRequest("objectiveCode (string) and completed (boolean) are required");
     }
 
     await saveStudyObjective(userId, objectiveCode, completed);
-    return NextResponse.json({ ok: true });
+    return jsonOk({ ok: true });
   } catch (error) {
     console.error("Error saving study progress:", error);
-    return NextResponse.json(
-      { error: "Failed to save study progress" },
-      { status: 500 },
-    );
+    return jsonError("Failed to save study progress");
   }
 }

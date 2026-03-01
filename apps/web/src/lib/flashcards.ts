@@ -104,18 +104,7 @@ export function sm2(
   };
 }
 
-// ---------------------------------------------------------------------------
-// Domain slug mapping
-// ---------------------------------------------------------------------------
-
-const DOMAIN_SLUGS: Record<number, string> = {
-  1: "software-dev",
-  2: "apis",
-  3: "cisco-platforms",
-  4: "deployment-security",
-  5: "infrastructure-automation",
-  6: "network-fundamentals",
-};
+import { NUMBER_TO_SLUG } from "@/lib/domains";
 
 // ---------------------------------------------------------------------------
 // File loading utilities (server-side only)
@@ -145,7 +134,7 @@ function getFlashcardsDir(): string {
 function loadFlashcardFile(filePath: string): Flashcard[] {
   const raw = fs.readFileSync(filePath, "utf-8");
   const data: RawFlashcardFile = JSON.parse(raw);
-  const slug = DOMAIN_SLUGS[data.domain] ?? `domain-${data.domain}`;
+  const slug = NUMBER_TO_SLUG[data.domain] ?? `domain-${data.domain}`;
 
   return data.flashcards.map((fc) => ({
     id: fc.id,
@@ -162,10 +151,15 @@ function loadFlashcardFile(filePath: string): Flashcard[] {
   }));
 }
 
+// Module-level cache (safe — flashcard JSON is static at runtime)
+let flashcardCache: Flashcard[] | null = null;
+
 /**
  * Returns all flashcards from every domain file.
  */
 export function getAllFlashcards(): Flashcard[] {
+  if (flashcardCache) return flashcardCache;
+
   const dir = getFlashcardsDir();
   const files = fs
     .readdirSync(dir)
@@ -176,6 +170,7 @@ export function getAllFlashcards(): Flashcard[] {
   for (const file of files) {
     all.push(...loadFlashcardFile(path.join(dir, file)));
   }
+  flashcardCache = all;
   return all;
 }
 

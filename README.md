@@ -80,6 +80,7 @@ devnet-studylab/
 ## Documentation
 
 - [SETUP.md](./SETUP.md) -- Step-by-step setup guide
+- [apps/web/REFACTOR.md](./apps/web/REFACTOR.md) -- 8-phase codebase refactor: shared modules, extracted components, and migration patterns
 - [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) -- System architecture and design decisions
 - [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) -- Complete API documentation
 - [docs/DATABASE_SCHEMA.md](./docs/DATABASE_SCHEMA.md) -- Database schema reference

@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { eq } from "drizzle-orm";
 
 import { isDbConfigured, getDb } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
+import { jsonOk, jsonBadRequest, jsonError } from "@/lib/api-helpers";
 
 export async function POST(request: Request) {
   try {
@@ -11,40 +11,25 @@ export async function POST(request: Request) {
 
     // Validate required fields
     if (!name || typeof name !== "string" || !name.trim()) {
-      return NextResponse.json(
-        { error: "Name is required" },
-        { status: 400 },
-      );
+      return jsonBadRequest("Name is required");
     }
 
     if (!email || typeof email !== "string") {
-      return NextResponse.json(
-        { error: "Valid email is required" },
-        { status: 400 },
-      );
+      return jsonBadRequest("Valid email is required");
     }
 
     // Basic email format check
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 },
-      );
+      return jsonBadRequest("Invalid email format");
     }
 
     if (!password || typeof password !== "string" || password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 },
-      );
+      return jsonBadRequest("Password must be at least 8 characters");
     }
 
     if (!isDbConfigured()) {
-      return NextResponse.json(
-        { error: "Database is not configured" },
-        { status: 503 },
-      );
+      return jsonError("Database is not configured", 503);
     }
 
     const db = getDb();
@@ -57,10 +42,7 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (existing) {
-      return NextResponse.json(
-        { error: "Email already in use" },
-        { status: 409 },
-      );
+      return jsonError("Email already in use", 409);
     }
 
     // Hash password and insert user
@@ -72,12 +54,9 @@ export async function POST(request: Request) {
       hashedPassword,
     });
 
-    return NextResponse.json({ success: true }, { status: 201 });
+    return jsonOk({ success: true }, 201);
   } catch (err) {
     console.error("Signup error:", err);
-    return NextResponse.json(
-      { error: "Something went wrong" },
-      { status: 500 },
-    );
+    return jsonError("Something went wrong");
   }
 }

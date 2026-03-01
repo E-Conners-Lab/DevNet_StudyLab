@@ -3,8 +3,9 @@
 import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { TerminalSquare, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import Link from "next/link";
+import { AuthLayout, AuthInput, AuthError, AuthButton } from "@/components/auth";
 
 // ---------------------------------------------------------------------------
 // Inner component (needs useSearchParams inside Suspense)
@@ -41,66 +42,33 @@ function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {error && (
-        <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-          {error}
-        </div>
-      )}
+      <AuthError message={error} />
 
-      <div className="space-y-2">
-        <label
-          htmlFor="email"
-          className="block text-sm font-medium text-zinc-300"
-        >
-          Email
-        </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30"
-          placeholder="you@example.com"
-        />
-      </div>
+      <AuthInput
+        id="email"
+        name="email"
+        type="email"
+        label="Email"
+        autoComplete="email"
+        required
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="you@example.com"
+      />
 
-      <div className="space-y-2">
-        <label
-          htmlFor="password"
-          className="block text-sm font-medium text-zinc-300"
-        >
-          Password
-        </label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-800/50 px-4 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 outline-none transition focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30"
-          placeholder="Enter your password"
-        />
-      </div>
+      <AuthInput
+        id="password"
+        name="password"
+        type="password"
+        label="Password"
+        autoComplete="current-password"
+        required
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter your password"
+      />
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed"
-      >
-        {loading ? (
-          <>
-            <Loader2 className="h-4 w-4 animate-spin" />
-            Signing in...
-          </>
-        ) : (
-          "Sign In"
-        )}
-      </button>
+      <AuthButton loading={loading} label="Sign In" loadingLabel="Signing in..." />
 
       <p className="text-center text-xs text-zinc-500">
         Default dev credentials:{" "}
@@ -127,36 +95,16 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-4">
-      <div className="w-full max-w-sm">
-        {/* Logo */}
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-500">
-            <TerminalSquare className="h-7 w-7" />
+    <AuthLayout subtitle="Sign in to continue studying">
+      <Suspense
+        fallback={
+          <div className="flex items-center justify-center py-8">
+            <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
           </div>
-          <div className="text-center">
-            <h1 className="text-xl font-bold tracking-tight text-zinc-50">
-              DevNet StudyLab
-            </h1>
-            <p className="mt-1 text-sm text-zinc-500">
-              Sign in to continue studying
-            </p>
-          </div>
-        </div>
-
-        {/* Card */}
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-6">
-          <Suspense
-            fallback={
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
-              </div>
-            }
-          >
-            <LoginForm />
-          </Suspense>
-        </div>
-      </div>
-    </div>
+        }
+      >
+        <LoginForm />
+      </Suspense>
+    </AuthLayout>
   );
 }

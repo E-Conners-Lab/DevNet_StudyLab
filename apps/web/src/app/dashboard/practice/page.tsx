@@ -32,6 +32,7 @@ import {
   Filter,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getDomainSelectOptions } from "@/lib/domains";
 
 interface PastAttempt {
   id: string;
@@ -123,15 +124,7 @@ function formatDate(iso: string): string {
   });
 }
 
-const domainOptions = [
-  { value: "all", label: "All Domains" },
-  { value: "software-dev", label: "1. Software Development & Design" },
-  { value: "apis", label: "2. Understanding & Using APIs" },
-  { value: "cisco-platforms", label: "3. Cisco Platforms & Development" },
-  { value: "deployment-security", label: "4. Application Deployment & Security" },
-  { value: "infrastructure-automation", label: "5. Infrastructure & Automation" },
-  { value: "network-fundamentals", label: "6. Network Fundamentals" },
-];
+const domainOptions = getDomainSelectOptions();
 
 export default function PracticePage() {
   const router = useRouter();

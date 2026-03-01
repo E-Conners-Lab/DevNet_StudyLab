@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getExam } from "@/lib/data";
+import { jsonOk, jsonNotFound, jsonError } from "@/lib/api-helpers";
 
 export async function GET(
   request: NextRequest,
@@ -16,18 +17,12 @@ export async function GET(
     });
 
     if (!exam) {
-      return NextResponse.json(
-        { error: `Exam "${examId}" not found` },
-        { status: 404 },
-      );
+      return jsonNotFound(`Exam "${examId}"`);
     }
 
-    return NextResponse.json(exam);
+    return jsonOk(exam);
   } catch (error) {
     console.error("Error loading exam:", error);
-    return NextResponse.json(
-      { error: "Failed to load exam" },
-      { status: 500 },
-    );
+    return jsonError("Failed to load exam");
   }
 }

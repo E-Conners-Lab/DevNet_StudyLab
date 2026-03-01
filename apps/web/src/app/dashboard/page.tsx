@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { DomainCard, type DomainData } from "@/components/dashboard/domain-card";
 import { StatsCard } from "@/components/dashboard/stats-card";
+import { DEVNET_DOMAINS } from "@/lib/domains";
 import {
   Target,
   Flame,
@@ -27,92 +28,22 @@ import {
 // Hardcoded defaults (used when DB is unavailable & for E2E tests)
 // ---------------------------------------------------------------------------
 
-const defaultDomains: DomainData[] = [
-  {
-    number: 1,
-    name: "Software Development & Design",
-    slug: "software-dev",
-    weight: 15,
-    progress: 42,
-    stats: {
-      objectivesCompleted: 5,
-      objectivesTotal: 12,
-      flashcardsDue: 8,
-      labsDone: 2,
-      labsTotal: 4,
-    },
-  },
-  {
-    number: 2,
-    name: "Understanding & Using APIs",
-    slug: "apis",
-    weight: 20,
-    progress: 65,
-    stats: {
-      objectivesCompleted: 9,
-      objectivesTotal: 14,
-      flashcardsDue: 5,
-      labsDone: 4,
-      labsTotal: 6,
-    },
-  },
-  {
-    number: 3,
-    name: "Cisco Platforms & Development",
-    slug: "cisco-platforms",
-    weight: 15,
-    progress: 28,
-    stats: {
-      objectivesCompleted: 3,
-      objectivesTotal: 11,
-      flashcardsDue: 12,
-      labsDone: 1,
-      labsTotal: 5,
-    },
-  },
-  {
-    number: 4,
-    name: "Application Deployment & Security",
-    slug: "deployment-security",
-    weight: 15,
-    progress: 55,
-    stats: {
-      objectivesCompleted: 6,
-      objectivesTotal: 10,
-      flashcardsDue: 3,
-      labsDone: 3,
-      labsTotal: 5,
-    },
-  },
-  {
-    number: 5,
-    name: "Infrastructure & Automation",
-    slug: "infrastructure-automation",
-    weight: 20,
-    progress: 38,
-    stats: {
-      objectivesCompleted: 5,
-      objectivesTotal: 13,
-      flashcardsDue: 10,
-      labsDone: 2,
-      labsTotal: 6,
-    },
-  },
-  {
-    number: 6,
-    name: "Network Fundamentals",
-    slug: "network-fundamentals",
-    weight: 15,
-    progress: 72,
-    stats: {
-      objectivesCompleted: 8,
-      objectivesTotal: 11,
-      flashcardsDue: 2,
-      labsDone: 3,
-      labsTotal: 4,
-    },
-  },
-];
+const DEFAULT_PROGRESS: Record<number, { progress: number; stats: DomainData["stats"] }> = {
+  1: { progress: 42, stats: { objectivesCompleted: 5, objectivesTotal: 12, flashcardsDue: 8, labsDone: 2, labsTotal: 4 } },
+  2: { progress: 65, stats: { objectivesCompleted: 9, objectivesTotal: 14, flashcardsDue: 5, labsDone: 4, labsTotal: 6 } },
+  3: { progress: 28, stats: { objectivesCompleted: 3, objectivesTotal: 11, flashcardsDue: 12, labsDone: 1, labsTotal: 5 } },
+  4: { progress: 55, stats: { objectivesCompleted: 6, objectivesTotal: 10, flashcardsDue: 3, labsDone: 3, labsTotal: 5 } },
+  5: { progress: 38, stats: { objectivesCompleted: 5, objectivesTotal: 13, flashcardsDue: 10, labsDone: 2, labsTotal: 6 } },
+  6: { progress: 72, stats: { objectivesCompleted: 8, objectivesTotal: 11, flashcardsDue: 2, labsDone: 3, labsTotal: 4 } },
+};
+
+const defaultDomains: DomainData[] = DEVNET_DOMAINS.map((d) => ({
+  number: d.number,
+  name: d.name,
+  slug: d.slug,
+  weight: d.weight,
+  ...DEFAULT_PROGRESS[d.number],
+}));
 
 const defaultRecentActivity = [
   {

@@ -9,6 +9,8 @@
 import fs from "fs";
 import path from "path";
 
+import { SLUG_TO_STUDY_FILE } from "@/lib/domains";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -39,25 +41,15 @@ export interface StudyGuide {
 }
 
 // ---------------------------------------------------------------------------
-// Slug → filename mapping
-// ---------------------------------------------------------------------------
-
-const SLUG_TO_FILE: Record<string, string> = {
-  "software-dev": "domain-1-software-dev.json",
-  apis: "domain-2-apis.json",
-  "cisco-platforms": "domain-3-cisco-platforms.json",
-  "deployment-security": "domain-4-deployment-security.json",
-  "infrastructure-automation": "domain-5-infrastructure-automation.json",
-  "network-fundamentals": "domain-6-network-fundamentals.json",
-};
-
-// ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 function getStudyGuidesDir(): string {
   return path.join(process.cwd(), "..", "..", "content", "study-guides");
 }
+
+// Module-level cache (safe — study guide JSON is static at runtime)
+const studyGuideCache = new Map<string, StudyGuide>();
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -67,12 +59,17 @@ function getStudyGuidesDir(): string {
  * Returns the study guide for the given domain slug, or null if not found.
  */
 export function getStudyGuide(slug: string): StudyGuide | null {
-  const filename = SLUG_TO_FILE[slug];
+  const cached = studyGuideCache.get(slug);
+  if (cached) return cached;
+
+  const filename = SLUG_TO_STUDY_FILE[slug];
   if (!filename) return null;
 
   const dir = getStudyGuidesDir();
   const filePath = path.join(dir, filename);
   if (!fs.existsSync(filePath)) return null;
 
-  return JSON.parse(fs.readFileSync(filePath, "utf-8")) as StudyGuide;
+  const guide = JSON.parse(fs.readFileSync(filePath, "utf-8")) as StudyGuide;
+  studyGuideCache.set(slug, guide);
+  return guide;
 }

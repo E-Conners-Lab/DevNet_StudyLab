@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-helpers";
 import { getExamAttempts } from "@/lib/data";
+import { jsonOk } from "@/lib/api-helpers";
 
 /**
  * GET /api/exams/attempts
@@ -12,9 +12,9 @@ export async function GET() {
   try {
     const userId = await getCurrentUserId();
     const attempts = await getExamAttempts(userId);
-    return NextResponse.json({ attempts });
+    return jsonOk({ attempts });
   } catch (error) {
     console.error("Error loading exam attempts:", error);
-    return NextResponse.json({ attempts: [] });
+    return jsonOk({ attempts: [] });
   }
 }
