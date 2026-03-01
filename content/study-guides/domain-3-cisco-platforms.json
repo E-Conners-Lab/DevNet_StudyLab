@@ -107,7 +107,7 @@
       ],
       "resources": [
         { "title": "Cisco Security APIs", "url": "https://developer.cisco.com/security/" },
-        { "title": "Cisco DevNet Security Learning Labs", "url": "https://developer.cisco.com/learning/modules/security/" }
+        { "title": "Cisco DevNet Security Learning Labs", "url": "https://developer.cisco.com/learning/labs/umbrella_overview/overview-of-cisco-umbrella/" }
       ]
     },
     {
@@ -170,7 +170,7 @@
       ],
       "resources": [
         { "title": "YANG Models on GitHub", "url": "https://github.com/YangModels/yang" },
-        { "title": "Cisco DevNet - Model Driven Programmability", "url": "https://developer.cisco.com/learning/modules/intro-device-level-interfaces/" }
+        { "title": "Cisco DevNet - Model Driven Programmability", "url": "https://developer.cisco.com/learning/labs/intro-netconf/introducing-yang-data-modeling-for-the-network/" }
       ]
     },
     {

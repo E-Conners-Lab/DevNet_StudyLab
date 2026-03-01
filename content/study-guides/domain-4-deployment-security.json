@@ -65,7 +65,7 @@
       ],
       "resources": [
         { "title": "Docker Documentation", "url": "https://docs.docker.com/" },
-        { "title": "Cisco DevNet - Containers Learning Lab", "url": "https://developer.cisco.com/learning/modules/dev-setup/" }
+        { "title": "Cisco DevNet - Containers Learning Lab", "url": "https://developer.cisco.com/learning/labs/docker-101/" }
       ]
     },
     {
@@ -85,7 +85,7 @@
         "Be familiar with common pipeline stages and their order: build, test, deploy"
       ],
       "resources": [
-        { "title": "Cisco DevNet - CI/CD Pipeline", "url": "https://developer.cisco.com/learning/modules/dev-setup/" },
+        { "title": "Cisco DevNet - CI/CD Pipeline", "url": "https://developer.cisco.com/learning/labs/containers-build-your-first-image/building-and-publishing-container-images/" },
         { "title": "GitHub Actions Documentation", "url": "https://docs.github.com/en/actions" }
       ]
     },
@@ -195,7 +195,7 @@
         "DNS is often the first point of failure in application connectivity issues"
       ],
       "resources": [
-        { "title": "Cisco DevNet - Application Architecture", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - Application Architecture", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" },
         { "title": "NGINX Reverse Proxy Guide", "url": "https://docs.nginx.com/nginx/admin-guide/web-server/reverse-proxy/" }
       ]
     },
@@ -238,7 +238,7 @@
       ],
       "resources": [
         { "title": "GNU Bash Manual", "url": "https://www.gnu.org/software/bash/manual/" },
-        { "title": "Linux Command Line Basics", "url": "https://developer.cisco.com/learning/modules/dev-setup/" }
+        { "title": "Linux Command Line Basics", "url": "https://developer.cisco.com/learning/labs/containers-intro-container-net/" }
       ]
     },
     {

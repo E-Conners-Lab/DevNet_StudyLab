@@ -22,7 +22,7 @@
         "Always check the required headers in API documentation, especially Content-Type and authentication headers"
       ],
       "resources": [
-        { "title": "Cisco DevNet - REST API Fundamentals", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - REST API Fundamentals", "url": "https://developer.cisco.com/learning/labs/dne-hands-on-rest-apis/hands-on-exercises-with-rest-apis/" },
         { "title": "MDN Web Docs - HTTP Methods", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods" }
       ]
     },
@@ -65,7 +65,7 @@
       ],
       "resources": [
         { "title": "Cisco Meraki API Rate Limits", "url": "https://developer.cisco.com/meraki/api-v1/rate-limit/" },
-        { "title": "Cisco DevNet - API Constraints", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - API Constraints", "url": "https://developer.cisco.com/learning/labs/dne-hands-on-rest-apis/hands-on-exercises-with-rest-apis/" }
       ]
     },
     {
@@ -111,7 +111,7 @@
         "Always check Content-Type header matches the body format (application/json for JSON bodies)"
       ],
       "resources": [
-        { "title": "Cisco DevNet - API Troubleshooting", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - API Troubleshooting", "url": "https://developer.cisco.com/learning/labs/postman-walkthrough/use-postman-to-interact-with-rest-apis/" },
         { "title": "Postman Learning Center", "url": "https://learning.postman.com/docs/getting-started/introduction/" }
       ]
     },
@@ -133,7 +133,7 @@
       ],
       "resources": [
         { "title": "MDN Web Docs - HTTP Responses", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Messages#http_responses" },
-        { "title": "Cisco DevNet - HTTP Fundamentals", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - HTTP Fundamentals", "url": "https://developer.cisco.com/learning/labs/dne-hands-on-rest-apis/hands-on-exercises-with-rest-apis/" }
       ]
     },
     {
@@ -154,7 +154,7 @@
         "Remember that Bearer tokens must be included in the Authorization header as 'Bearer <token>'"
       ],
       "resources": [
-        { "title": "Cisco DevNet - API Authentication", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - API Authentication", "url": "https://developer.cisco.com/learning/labs/dnac-api-python/cisco-dna-center/" },
         { "title": "MDN Web Docs - HTTP Authentication", "url": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication" }
       ]
     },
@@ -176,7 +176,7 @@
         "Know that NETCONF is RPC-based while RESTCONF is REST-based"
       ],
       "resources": [
-        { "title": "Cisco DevNet - API Styles Comparison", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - API Styles Comparison", "url": "https://developer.cisco.com/learning/labs/intro-netconf/introducing-yang-data-modeling-for-the-network/" },
         { "title": "REST vs RPC Explained", "url": "https://www.smashingmagazine.com/2016/09/understanding-rest-and-rpc-for-http-apis/" }
       ]
     },
@@ -199,7 +199,7 @@
       ],
       "resources": [
         { "title": "Python Requests Library Documentation", "url": "https://docs.python-requests.org/" },
-        { "title": "Cisco DevNet - Python REST API Lab", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Python REST API Lab", "url": "https://developer.cisco.com/learning/labs/webex-messaging-python/introduction/" }
       ]
     }
   ],

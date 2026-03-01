@@ -24,7 +24,7 @@
       ],
       "resources": [
         { "title": "Cisco - VLANs and Trunking", "url": "https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst9300/software/release/17-6/configuration_guide/vlan/b_176_vlan_9300_cg.html" },
-        { "title": "Cisco DevNet - Network Fundamentals", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Fundamentals", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -68,7 +68,7 @@
       ],
       "resources": [
         { "title": "Cisco Networking Basics", "url": "https://www.cisco.com/c/en/us/solutions/small-business/resource-center/networking/networking-basics.html" },
-        { "title": "Cisco DevNet - Network Components", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Components", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -90,7 +90,7 @@
       ],
       "resources": [
         { "title": "Cisco Network Diagram Symbols", "url": "https://www.cisco.com/c/en/us/about/brand-center/network-topology-icons.html" },
-        { "title": "Cisco DevNet - Network Diagrams", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Diagrams", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -112,7 +112,7 @@
       ],
       "resources": [
         { "title": "Cisco - Control and Data Planes", "url": "https://www.ciscopress.com/articles/article.asp?p=2272154&seqNum=3" },
-        { "title": "Cisco DevNet - Network Planes", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Planes", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -133,7 +133,7 @@
       ],
       "resources": [
         { "title": "Cisco - IP Services Configuration", "url": "https://www.cisco.com/c/en/us/td/docs/routers/ios/config/17-x/ip-addressing/b-ip-addressing.html" },
-        { "title": "Cisco DevNet - Network Services", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Services", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -157,7 +157,7 @@
       ],
       "resources": [
         { "title": "IANA Service Name and Port Number Registry", "url": "https://www.iana.org/assignments/service-names-port-numbers/" },
-        { "title": "Cisco DevNet - Protocol Ports", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Protocol Ports", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -178,7 +178,7 @@
       ],
       "resources": [
         { "title": "Cisco Troubleshooting Guide", "url": "https://www.cisco.com/c/en/us/support/docs/ip/network-address-translation-nat/26704-nat-faq-00.html" },
-        { "title": "Cisco DevNet - Network Troubleshooting", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Troubleshooting", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     },
     {
@@ -199,7 +199,7 @@
       ],
       "resources": [
         { "title": "Cisco QoS Overview", "url": "https://www.cisco.com/c/en/us/td/docs/routers/ios/config/17-x/qos/b-quality-of-service.html" },
-        { "title": "Cisco DevNet - Network Performance", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Network Performance", "url": "https://developer.cisco.com/learning/labs/networking-101-the-basics/what-is-a-network/" }
       ]
     }
   ],

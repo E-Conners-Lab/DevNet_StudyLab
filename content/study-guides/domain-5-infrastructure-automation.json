@@ -22,7 +22,7 @@
         "Remember that both NETCONF and RESTCONF rely on YANG models for data structure definition"
       ],
       "resources": [
-        { "title": "Cisco DevNet - Model Driven Programmability", "url": "https://developer.cisco.com/learning/modules/intro-device-level-interfaces/" },
+        { "title": "Cisco DevNet - Model Driven Programmability", "url": "https://developer.cisco.com/learning/labs/intro-netconf/introducing-yang-data-modeling-for-the-network/" },
         { "title": "RFC 7950 - YANG 1.1", "url": "https://datatracker.ietf.org/doc/html/rfc7950" }
       ]
     },
@@ -43,7 +43,7 @@
         "Understand that Meraki is cloud-managed (controller in cloud) while Catalyst Center is on-premises"
       ],
       "resources": [
-        { "title": "Cisco DevNet - Controller vs Device Management", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - Controller vs Device Management", "url": "https://developer.cisco.com/learning/labs/why-mdp/what-was-rfc3535/" },
         { "title": "Cisco Catalyst Center Overview", "url": "https://developer.cisco.com/docs/dna-center/" }
       ]
     },
@@ -106,7 +106,7 @@
         "Understand that IaC and GitOps work together: Git repo stores configs, CI/CD deploys them"
       ],
       "resources": [
-        { "title": "Cisco DevNet - Infrastructure as Code", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - Infrastructure as Code", "url": "https://developer.cisco.com/learning/labs/intro-to-aci-terraform-start/overview-and-objectives/" },
         { "title": "Terraform Documentation", "url": "https://developer.hashicorp.com/terraform/docs" }
       ]
     },
@@ -149,7 +149,7 @@
       ],
       "resources": [
         { "title": "Cisco DevNet Code Exchange", "url": "https://developer.cisco.com/codeexchange/" },
-        { "title": "Cisco DevNet - API Automation Examples", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - API Automation Examples", "url": "https://developer.cisco.com/learning/labs/dnac-api-python/cisco-dna-center/" }
       ]
     },
     {
@@ -170,7 +170,7 @@
       ],
       "resources": [
         { "title": "Ansible Playbook Documentation", "url": "https://docs.ansible.com/ansible/latest/playbook_guide/" },
-        { "title": "Cisco DevNet - Ansible for Network Automation", "url": "https://developer.cisco.com/learning/modules/sdx-ansible/" }
+        { "title": "Cisco DevNet - Ansible for Network Automation", "url": "https://developer.cisco.com/learning/labs/ansible-overview/" }
       ]
     },
     {
@@ -212,7 +212,7 @@
       ],
       "resources": [
         { "title": "RFC 8040 - RESTCONF Protocol", "url": "https://datatracker.ietf.org/doc/html/rfc8040" },
-        { "title": "Cisco DevNet - RESTCONF and NETCONF Labs", "url": "https://developer.cisco.com/learning/modules/intro-device-level-interfaces/" }
+        { "title": "Cisco DevNet - RESTCONF and NETCONF Labs", "url": "https://developer.cisco.com/learning/labs/intro-netconf/introducing-yang-data-modeling-for-the-network/" }
       ]
     },
     {
@@ -232,7 +232,7 @@
         "Understand the hierarchy: module contains containers, which contain leaves and lists"
       ],
       "resources": [
-        { "title": "YANG Language Introduction", "url": "https://developer.cisco.com/learning/modules/intro-device-level-interfaces/" },
+        { "title": "YANG Language Introduction", "url": "https://developer.cisco.com/learning/labs/intro-netconf/introducing-yang-data-modeling-for-the-network/" },
         { "title": "RFC 7950 - YANG 1.1", "url": "https://datatracker.ietf.org/doc/html/rfc7950" }
       ]
     },
@@ -296,7 +296,7 @@
       ],
       "resources": [
         { "title": "UML Sequence Diagrams", "url": "https://www.uml-diagrams.org/sequence-diagrams.html" },
-        { "title": "Cisco DevNet - API Design Documentation", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - API Design Documentation", "url": "https://developer.cisco.com/learning/labs/dne-hands-on-rest-apis/hands-on-exercises-with-rest-apis/" }
       ]
     }
   ],

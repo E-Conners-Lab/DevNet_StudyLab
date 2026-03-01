@@ -22,7 +22,7 @@
         "Remember that YAML is a superset of JSON, meaning valid JSON is also valid YAML"
       ],
       "resources": [
-        { "title": "Cisco DevNet - Parsing Data Formats", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" },
+        { "title": "Cisco DevNet - Parsing Data Formats", "url": "https://developer.cisco.com/learning/labs/dne-parsing-json-python/introduction/" },
         { "title": "JSON.org Specification", "url": "https://www.json.org/" }
       ]
     },
@@ -42,7 +42,7 @@
       ],
       "resources": [
         { "title": "Python json Module Documentation", "url": "https://docs.python.org/3/library/json.html" },
-        { "title": "Cisco DevNet - Working with Data in Python", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Working with Data in Python", "url": "https://developer.cisco.com/learning/labs/dne-intro-python-basics/introduction/" }
       ]
     },
     {
@@ -61,7 +61,7 @@
       ],
       "resources": [
         { "title": "Python unittest Documentation", "url": "https://docs.python.org/3/library/unittest.html" },
-        { "title": "Cisco DevNet - Software Development Practices", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Software Development Practices", "url": "https://developer.cisco.com/learning/labs/intro-coding-and-apis/why-python/" }
       ]
     },
     {
@@ -82,7 +82,7 @@
       ],
       "resources": [
         { "title": "Agile Manifesto", "url": "https://agilemanifesto.org/" },
-        { "title": "Cisco DevNet - Software Development Methodologies", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Software Development Methodologies", "url": "https://developer.cisco.com/certification/fundamentals/" }
       ]
     },
     {
@@ -102,7 +102,7 @@
       ],
       "resources": [
         { "title": "Python Modules Documentation", "url": "https://docs.python.org/3/tutorial/modules.html" },
-        { "title": "Cisco DevNet - Python Fundamentals", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Python Fundamentals", "url": "https://developer.cisco.com/learning/labs/dne-intro-python-basics/introduction/" }
       ]
     },
     {
@@ -121,7 +121,7 @@
       ],
       "resources": [
         { "title": "MDN Web Docs - MVC Architecture", "url": "https://developer.mozilla.org/en-US/docs/Glossary/MVC" },
-        { "title": "Cisco DevNet - Application Design Patterns", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Application Design Patterns", "url": "https://developer.cisco.com/certification/fundamentals/" }
       ]
     },
     {
@@ -142,7 +142,7 @@
       ],
       "resources": [
         { "title": "Git Official Documentation", "url": "https://git-scm.com/doc" },
-        { "title": "Cisco DevNet - Version Control with Git", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Version Control with Git", "url": "https://developer.cisco.com/learning/labs/git-intro/" }
       ]
     },
     {
