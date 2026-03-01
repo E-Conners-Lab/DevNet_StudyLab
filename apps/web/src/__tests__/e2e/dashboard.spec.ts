@@ -791,6 +791,67 @@ test.describe("Login Page", () => {
     const signInBtn = page.getByRole("button", { name: /Sign In/i });
     await expect(signInBtn).toBeVisible();
   });
+
+  test("login page has sign up link that navigates to signup", async ({ page }) => {
+    await page.goto("/login");
+    await page.waitForLoadState("networkidle");
+
+    const signUpLink = page.getByRole("link", { name: /Sign up/i });
+    await expect(signUpLink).toBeVisible();
+    await signUpLink.click();
+    await page.waitForURL(/\/signup/);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SIGNUP PAGE — Form elements and client-side validation
+// ══════════════════════════════════════════════════════════════════════════════
+test.describe("Signup Page", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/signup");
+    await page.waitForLoadState("networkidle");
+  });
+
+  test("signup page renders with all form fields", async ({ page }) => {
+    await expect(page.getByText("DevNet StudyLab").first()).toBeVisible();
+    await expect(page.getByText("Create your account")).toBeVisible();
+    await expect(page.getByLabel("Name")).toBeVisible();
+    await expect(page.getByLabel("Email")).toBeVisible();
+    await expect(page.getByLabel("Password", { exact: true })).toBeVisible();
+    await expect(page.getByLabel("Confirm Password")).toBeVisible();
+
+    const createBtn = page.getByRole("button", { name: /Create Account/i });
+    await expect(createBtn).toBeVisible();
+  });
+
+  test("signup page has sign in link that navigates to login", async ({ page }) => {
+    const signInLink = page.getByRole("link", { name: /Sign in/i });
+    await expect(signInLink).toBeVisible();
+    await signInLink.click();
+    await page.waitForURL(/\/login/);
+  });
+
+  test("shows error when passwords do not match", async ({ page }) => {
+    await page.getByLabel("Name").fill("Test User");
+    await page.getByLabel("Email").fill("test@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("password123");
+    await page.getByLabel("Confirm Password").fill("different123");
+
+    await page.getByRole("button", { name: /Create Account/i }).click();
+
+    await expect(page.getByText("Passwords do not match")).toBeVisible();
+  });
+
+  test("shows error when password is too short", async ({ page }) => {
+    await page.getByLabel("Name").fill("Test User");
+    await page.getByLabel("Email").fill("test@example.com");
+    await page.getByLabel("Password", { exact: true }).fill("short");
+    await page.getByLabel("Confirm Password").fill("short");
+
+    await page.getByRole("button", { name: /Create Account/i }).click();
+
+    await expect(page.getByText("Password must be at least 8 characters")).toBeVisible();
+  });
 });
 
 // ══════════════════════════════════════════════════════════════════════════════

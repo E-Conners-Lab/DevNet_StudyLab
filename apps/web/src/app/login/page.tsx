@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { TerminalSquare, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 // ---------------------------------------------------------------------------
 // Inner component (needs useSearchParams inside Suspense)
@@ -105,6 +106,16 @@ function LoginForm() {
         Default dev credentials:{" "}
         <span className="text-zinc-400">student@devnet.lab</span> /{" "}
         <span className="text-zinc-400">devnet123</span>
+      </p>
+
+      <p className="text-center text-sm text-zinc-500">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/signup"
+          className="text-emerald-500 hover:text-emerald-400 transition"
+        >
+          Sign up
+        </Link>
       </p>
     </form>
   );
