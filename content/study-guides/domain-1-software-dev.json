@@ -162,7 +162,7 @@
       ],
       "resources": [
         { "title": "GitHub Docs - Git Handbook", "url": "https://docs.github.com/en/get-started/using-git" },
-        { "title": "Cisco DevNet - Git Lab Exercises", "url": "https://developer.cisco.com/learning/modules/devnet-associate/" }
+        { "title": "Cisco DevNet - Hands-on with Git and GitHub", "url": "https://developer.cisco.com/learning/labs/dne-git-basic-workflows/hands-on-with-git-and-github/" }
       ]
     }
   ],
