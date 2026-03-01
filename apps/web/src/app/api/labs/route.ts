@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { listLabs } from "@/lib/data";
+import { jsonOk, jsonError } from "@/lib/api-helpers";
 
 export async function GET(request: NextRequest) {
   try {
@@ -12,12 +13,9 @@ export async function GET(request: NextRequest) {
       domain: domainFilter ?? undefined,
     });
 
-    return NextResponse.json({ labs });
+    return jsonOk({ labs });
   } catch (error) {
     console.error("Error loading labs:", error);
-    return NextResponse.json(
-      { error: "Failed to load labs" },
-      { status: 500 },
-    );
+    return jsonError("Failed to load labs");
   }
 }

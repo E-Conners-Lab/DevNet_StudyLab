@@ -1,19 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, ArrowLeft, RotateCcw } from "lucide-react";
-
-function formatRelativeDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = date.getTime() - now.getTime();
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-  if (diffDays <= 0) return "Today";
-  if (diffDays === 1) return "Tomorrow";
-  if (diffDays < 7) return `In ${diffDays} days`;
-  if (diffDays < 30) return `In ${Math.ceil(diffDays / 7)} weeks`;
-  return `In ${Math.ceil(diffDays / 30)} months`;
-}
+import { formatRelativeDate } from "@/lib/ui-constants";
 
 interface ReviewCompleteProps {
   sessionStats: {

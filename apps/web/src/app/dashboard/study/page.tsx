@@ -20,11 +20,11 @@ import {
   FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { DEVNET_DOMAINS } from "@/lib/domains";
 
 interface Objective {
   id: string;
   title: string;
-  completed: boolean;
   labSlug?: string;
 }
 
@@ -33,132 +33,91 @@ interface StudyDomain {
   name: string;
   slug: string;
   weight: number;
-  progress: number;
   objectives: Objective[];
 }
 
-const studyDomains: StudyDomain[] = [
-  {
-    number: 1,
-    name: "Software Development & Design",
-    slug: "software-dev",
-    weight: 15,
-    progress: 42,
-    objectives: [
-      { id: "1.1", title: "Compare data formats (XML, JSON, and YAML)", completed: false },
-      { id: "1.2", title: "Describe parsing of common data format to Python data structures", completed: false },
-      { id: "1.3", title: "Describe the concepts of test-driven development", completed: false },
-      { id: "1.4", title: "Compare software development methods (Agile, Lean, Waterfall)", completed: false },
-      { id: "1.5", title: "Explain the benefits of organizing code into methods, functions, classes, and modules", completed: false },
-      { id: "1.6", title: "Identify the advantages of common design patterns (MVC and Observer)", completed: false },
-      { id: "1.7", title: "Explain the advantages of version control", completed: false, labSlug: "git-basics" },
-      { id: "1.8", title: "Utilize common version control operations with Git", completed: false, labSlug: "git-basics" },
-    ],
-  },
-  {
-    number: 2,
-    name: "Understanding & Using APIs",
-    slug: "apis",
-    weight: 20,
-    progress: 65,
-    objectives: [
-      { id: "2.1", title: "Construct a REST API request to accomplish a task given API documentation", completed: false, labSlug: "rest-api-client" },
-      { id: "2.2", title: "Describe common usage patterns related to webhooks", completed: false },
-      { id: "2.3", title: "Identify the constraints when consuming APIs", completed: false },
-      { id: "2.4", title: "Explain common HTTP response codes associated with REST APIs", completed: false },
-      { id: "2.5", title: "Troubleshoot a problem given the HTTP response code, request and API documentation", completed: false },
-      { id: "2.6", title: "Identify the parts of an HTTP response (response code, headers, body)", completed: false },
-      { id: "2.7", title: "Utilize common API authentication mechanisms: basic, custom token, and API keys", completed: false },
-      { id: "2.8", title: "Compare common API styles (REST, RPC, synchronous, and asynchronous)", completed: false },
-      { id: "2.9", title: "Construct a Python script that calls a REST API using the requests library", completed: false, labSlug: "rest-api-client" },
-    ],
-  },
-  {
-    number: 3,
-    name: "Cisco Platforms & Development",
-    slug: "cisco-platforms",
-    weight: 15,
-    progress: 28,
-    objectives: [
-      { id: "3.1", title: "Construct a Python script that uses a Cisco SDK given SDK documentation", completed: false },
-      { id: "3.2", title: "Describe the capabilities of Cisco network management platforms (Meraki, DNA Center, ACI, NSO)", completed: false },
-      { id: "3.3", title: "Describe the capabilities of Cisco compute management platforms (UCS Manager, Intersight)", completed: false },
-      { id: "3.4", title: "Describe the capabilities of Cisco collaboration platforms (Webex Teams, Webex devices)", completed: false },
-      { id: "3.5", title: "Describe the capabilities of Cisco security platforms (Firepower, Umbrella, AMP, ISE, ThreatGrid)", completed: false },
-      { id: "3.6", title: "Describe the device level APIs and dynamic interfaces for IOS XE and NX-OS", completed: false, labSlug: "netconf-basics" },
-      { id: "3.7", title: "Identify the appropriate DevNet resource for a given scenario", completed: false },
-    ],
-  },
-  {
-    number: 4,
-    name: "Application Deployment & Security",
-    slug: "deployment-security",
-    weight: 15,
-    progress: 55,
-    objectives: [
-      { id: "4.1", title: "Describe benefits of edge computing", completed: false },
-      { id: "4.2", title: "Identify attributes of different application deployment models (private cloud, public cloud, hybrid cloud, edge)", completed: false },
-      { id: "4.3", title: "Identify the attributes of these application deployment types (virtual machines, bare metal, containers)", completed: false },
-      { id: "4.4", title: "Describe components for a CI/CD pipeline in application deployments", completed: false, labSlug: "docker-basics" },
-      { id: "4.5", title: "Construct a Python unit test", completed: false },
-      { id: "4.6", title: "Interpret contents of a Dockerfile", completed: false, labSlug: "docker-basics" },
-      { id: "4.7", title: "Utilize Docker images to create containers", completed: false, labSlug: "docker-basics" },
-      { id: "4.8", title: "Identify steps needed to integrate an application into a prebuilt CI/CD workflow", completed: false },
-    ],
-  },
-  {
-    number: 5,
-    name: "Infrastructure & Automation",
-    slug: "infrastructure-automation",
-    weight: 20,
-    progress: 38,
-    objectives: [
-      { id: "5.1", title: "Describe the value of model driven programmability for infrastructure automation", completed: false },
-      { id: "5.2", title: "Compare controller-level to device-level management", completed: false },
-      { id: "5.3", title: "Describe the use and roles of network simulation and test tools (pyATS)", completed: false },
-      { id: "5.4", title: "Describe the components and benefits of CI/CD pipeline in infrastructure automation", completed: false },
-      { id: "5.5", title: "Describe principles of infrastructure as code", completed: false },
-      { id: "5.6", title: "Describe the capabilities of automation tools such as Ansible, Puppet, Chef, and Cisco NSO", completed: false, labSlug: "ansible-network" },
-      { id: "5.7", title: "Identify the workflow being automated by a Python script that uses Cisco APIs including ACI, Meraki, DNA Center, or RESTCONF", completed: false },
-      { id: "5.8", title: "Identify the workflow being automated by an Ansible playbook", completed: false, labSlug: "ansible-network" },
-      { id: "5.9", title: "Identify the workflow being automated by a bash script", completed: false, labSlug: "bash-scripting" },
-      { id: "5.10", title: "Interpret the results of a RESTCONF or NETCONF query", completed: false, labSlug: "netconf-basics" },
-    ],
-  },
-  {
-    number: 6,
-    name: "Network Fundamentals",
-    slug: "network-fundamentals",
-    weight: 15,
-    progress: 72,
-    objectives: [
-      { id: "6.1", title: "Describe the purpose and usage of MAC addresses and VLANs", completed: false },
-      { id: "6.2", title: "Describe the purpose and usage of IP addresses, routes, subnet mask / prefix, and gateways", completed: false },
-      { id: "6.3", title: "Describe the function of common networking components (switches, routers, firewalls, load balancers)", completed: false },
-      { id: "6.4", title: "Interpret a basic network topology diagram", completed: false },
-      { id: "6.5", title: "Describe the function of management, data, and control planes in a network device", completed: false },
-      { id: "6.6", title: "Describe the functionality of these IP services: DHCP, DNS, NAT, SNMP, NTP", completed: false },
-      { id: "6.7", title: "Recognize common protocol port numbers (SSH, Telnet, HTTP, HTTPS, NETCONF)", completed: false },
-      { id: "6.8", title: "Identify cause of application connectivity issues (NAT problem, Transport port blocked, proxy, VPN)", completed: false },
-      { id: "6.9", title: "Explain the impacts of network constraints on applications", completed: false },
-    ],
-  },
-];
+/** Exam objectives per domain (content that doesn't live in the canonical domains list) */
+const DOMAIN_OBJECTIVES: Record<number, Objective[]> = {
+  1: [
+    { id: "1.1", title: "Compare data formats (XML, JSON, and YAML)" },
+    { id: "1.2", title: "Describe parsing of common data format to Python data structures" },
+    { id: "1.3", title: "Describe the concepts of test-driven development" },
+    { id: "1.4", title: "Compare software development methods (Agile, Lean, Waterfall)" },
+    { id: "1.5", title: "Explain the benefits of organizing code into methods, functions, classes, and modules" },
+    { id: "1.6", title: "Identify the advantages of common design patterns (MVC and Observer)" },
+    { id: "1.7", title: "Explain the advantages of version control", labSlug: "git-basics" },
+    { id: "1.8", title: "Utilize common version control operations with Git", labSlug: "git-basics" },
+  ],
+  2: [
+    { id: "2.1", title: "Construct a REST API request to accomplish a task given API documentation", labSlug: "rest-api-client" },
+    { id: "2.2", title: "Describe common usage patterns related to webhooks" },
+    { id: "2.3", title: "Identify the constraints when consuming APIs" },
+    { id: "2.4", title: "Explain common HTTP response codes associated with REST APIs" },
+    { id: "2.5", title: "Troubleshoot a problem given the HTTP response code, request and API documentation" },
+    { id: "2.6", title: "Identify the parts of an HTTP response (response code, headers, body)" },
+    { id: "2.7", title: "Utilize common API authentication mechanisms: basic, custom token, and API keys" },
+    { id: "2.8", title: "Compare common API styles (REST, RPC, synchronous, and asynchronous)" },
+    { id: "2.9", title: "Construct a Python script that calls a REST API using the requests library", labSlug: "rest-api-client" },
+  ],
+  3: [
+    { id: "3.1", title: "Construct a Python script that uses a Cisco SDK given SDK documentation" },
+    { id: "3.2", title: "Describe the capabilities of Cisco network management platforms (Meraki, DNA Center, ACI, NSO)" },
+    { id: "3.3", title: "Describe the capabilities of Cisco compute management platforms (UCS Manager, Intersight)" },
+    { id: "3.4", title: "Describe the capabilities of Cisco collaboration platforms (Webex Teams, Webex devices)" },
+    { id: "3.5", title: "Describe the capabilities of Cisco security platforms (Firepower, Umbrella, AMP, ISE, ThreatGrid)" },
+    { id: "3.6", title: "Describe the device level APIs and dynamic interfaces for IOS XE and NX-OS", labSlug: "netconf-basics" },
+    { id: "3.7", title: "Identify the appropriate DevNet resource for a given scenario" },
+  ],
+  4: [
+    { id: "4.1", title: "Describe benefits of edge computing" },
+    { id: "4.2", title: "Identify attributes of different application deployment models (private cloud, public cloud, hybrid cloud, edge)" },
+    { id: "4.3", title: "Identify the attributes of these application deployment types (virtual machines, bare metal, containers)" },
+    { id: "4.4", title: "Describe components for a CI/CD pipeline in application deployments", labSlug: "docker-basics" },
+    { id: "4.5", title: "Construct a Python unit test" },
+    { id: "4.6", title: "Interpret contents of a Dockerfile", labSlug: "docker-basics" },
+    { id: "4.7", title: "Utilize Docker images to create containers", labSlug: "docker-basics" },
+    { id: "4.8", title: "Identify steps needed to integrate an application into a prebuilt CI/CD workflow" },
+  ],
+  5: [
+    { id: "5.1", title: "Describe the value of model driven programmability for infrastructure automation" },
+    { id: "5.2", title: "Compare controller-level to device-level management" },
+    { id: "5.3", title: "Describe the use and roles of network simulation and test tools (pyATS)" },
+    { id: "5.4", title: "Describe the components and benefits of CI/CD pipeline in infrastructure automation" },
+    { id: "5.5", title: "Describe principles of infrastructure as code" },
+    { id: "5.6", title: "Describe the capabilities of automation tools such as Ansible, Puppet, Chef, and Cisco NSO", labSlug: "ansible-network" },
+    { id: "5.7", title: "Identify the workflow being automated by a Python script that uses Cisco APIs including ACI, Meraki, DNA Center, or RESTCONF" },
+    { id: "5.8", title: "Identify the workflow being automated by an Ansible playbook", labSlug: "ansible-network" },
+    { id: "5.9", title: "Identify the workflow being automated by a bash script", labSlug: "bash-scripting" },
+    { id: "5.10", title: "Interpret the results of a RESTCONF or NETCONF query", labSlug: "netconf-basics" },
+  ],
+  6: [
+    { id: "6.1", title: "Describe the purpose and usage of MAC addresses and VLANs" },
+    { id: "6.2", title: "Describe the purpose and usage of IP addresses, routes, subnet mask / prefix, and gateways" },
+    { id: "6.3", title: "Describe the function of common networking components (switches, routers, firewalls, load balancers)" },
+    { id: "6.4", title: "Interpret a basic network topology diagram" },
+    { id: "6.5", title: "Describe the function of management, data, and control planes in a network device" },
+    { id: "6.6", title: "Describe the functionality of these IP services: DHCP, DNS, NAT, SNMP, NTP" },
+    { id: "6.7", title: "Recognize common protocol port numbers (SSH, Telnet, HTTP, HTTPS, NETCONF)" },
+    { id: "6.8", title: "Identify cause of application connectivity issues (NAT problem, Transport port blocked, proxy, VPN)" },
+    { id: "6.9", title: "Explain the impacts of network constraints on applications" },
+  ],
+};
+
+/** Build study domains from canonical DEVNET_DOMAINS + per-domain objectives */
+const studyDomains: StudyDomain[] = DEVNET_DOMAINS.map((d) => ({
+  number: d.number,
+  name: d.name,
+  slug: d.slug,
+  weight: d.weight,
+  objectives: DOMAIN_OBJECTIVES[d.number] ?? [],
+}));
 
 export default function StudyPage() {
   const [expandedDomains, setExpandedDomains] = useState<Set<string>>(
     new Set()
   );
   const [completedObjectives, setCompletedObjectives] = useState<Set<string>>(
-    () => {
-      const completed = new Set<string>();
-      studyDomains.forEach((domain) => {
-        domain.objectives.forEach((obj) => {
-          if (obj.completed) completed.add(obj.id);
-        });
-      });
-      return completed;
-    }
+    new Set()
   );
 
   // Load study progress from API (DB wins over hardcoded defaults)

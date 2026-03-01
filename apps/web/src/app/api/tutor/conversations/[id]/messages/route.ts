@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-helpers";
 import { saveTutorMessage } from "@/lib/data";
+import { jsonOk, jsonBadRequest, jsonError } from "@/lib/api-helpers";
 
 /**
  * POST /api/tutor/conversations/[id]/messages
@@ -15,7 +16,7 @@ export async function POST(
     const { id } = await params;
     const userId = await getCurrentUserId();
     if (!userId) {
-      return NextResponse.json({ id: null });
+      return jsonOk({ id: null });
     }
 
     const body = await request.json();
@@ -25,26 +26,17 @@ export async function POST(
     };
 
     if (!role || !content) {
-      return NextResponse.json(
-        { error: "role and content are required" },
-        { status: 400 },
-      );
+      return jsonBadRequest("role and content are required");
     }
 
     if (role !== "user" && role !== "assistant") {
-      return NextResponse.json(
-        { error: "role must be 'user' or 'assistant'" },
-        { status: 400 },
-      );
+      return jsonBadRequest("role must be 'user' or 'assistant'");
     }
 
     const messageId = await saveTutorMessage(userId, id, { role, content });
-    return NextResponse.json({ id: messageId });
+    return jsonOk({ id: messageId });
   } catch (error) {
     console.error("Error saving tutor message:", error);
-    return NextResponse.json(
-      { error: "Failed to save message" },
-      { status: 500 },
-    );
+    return jsonError("Failed to save message");
   }
 }

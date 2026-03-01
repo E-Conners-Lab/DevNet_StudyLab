@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, ExternalLink, Keyboard, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getDifficultyClasses } from "@/lib/ui-constants";
+import { getDifficultyClasses, getStatusBadge } from "@/lib/ui-constants";
 import type { Flashcard, FlashcardProgress } from "@/lib/flashcards";
 
 // ---------------------------------------------------------------------------
@@ -51,16 +51,6 @@ const RATING_CONFIG: Record<
     description: "~7 days",
   },
 };
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function getStatusBadge(interval: number | undefined, hasProgress: boolean) {
-  if (!hasProgress) return { label: "New", className: "bg-blue-500/10 text-blue-400" };
-  if (interval !== undefined && interval > 21) return { label: "Mastered", className: "bg-emerald-500/10 text-emerald-400" };
-  return { label: "Learning", className: "bg-amber-500/10 text-amber-400" };
-}
 
 // ---------------------------------------------------------------------------
 // Component

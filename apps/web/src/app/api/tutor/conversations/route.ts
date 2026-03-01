@@ -1,9 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-helpers";
 import {
   getTutorConversations,
   createTutorConversation,
 } from "@/lib/data";
+import { jsonOk, jsonBadRequest, jsonError } from "@/lib/api-helpers";
 
 /**
  * GET /api/tutor/conversations
@@ -14,10 +15,10 @@ export async function GET() {
   try {
     const userId = await getCurrentUserId();
     const conversations = await getTutorConversations(userId);
-    return NextResponse.json({ conversations });
+    return jsonOk({ conversations });
   } catch (error) {
     console.error("Error loading tutor conversations:", error);
-    return NextResponse.json({ conversations: [] });
+    return jsonOk({ conversations: [] });
   }
 }
 
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
   try {
     const userId = await getCurrentUserId();
     if (!userId) {
-      return NextResponse.json({ id: null });
+      return jsonOk({ id: null });
     }
 
     const body = await request.json();
@@ -40,10 +41,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (!title || typeof title !== "string") {
-      return NextResponse.json(
-        { error: "title is required" },
-        { status: 400 },
-      );
+      return jsonBadRequest("title is required");
     }
 
     const id = await createTutorConversation(userId, {
@@ -51,12 +49,9 @@ export async function POST(request: NextRequest) {
       domainId: domainId ?? null,
     });
 
-    return NextResponse.json({ id });
+    return jsonOk({ id });
   } catch (error) {
     console.error("Error creating tutor conversation:", error);
-    return NextResponse.json(
-      { error: "Failed to create conversation" },
-      { status: 500 },
-    );
+    return jsonError("Failed to create conversation");
   }
 }

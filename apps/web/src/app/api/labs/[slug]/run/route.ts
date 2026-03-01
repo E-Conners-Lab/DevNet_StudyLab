@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { execFile } from "child_process";
 import { writeFile, unlink } from "fs/promises";
 import { tmpdir } from "os";
@@ -6,6 +6,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { getLabForRun, saveLabAttempt } from "@/lib/data";
 import { getCurrentUserId } from "@/lib/auth-helpers";
+import { jsonOk, jsonNotFound, jsonBadRequest, jsonError } from "@/lib/api-helpers";
 
 // ---------------------------------------------------------------------------
 // Lab types that can be executed as Python scripts
@@ -80,10 +81,7 @@ export async function POST(
     const lab = getLabForRun(slug);
 
     if (!lab) {
-      return NextResponse.json(
-        { error: `Lab "${slug}" not found` },
-        { status: 404 },
-      );
+      return jsonNotFound(`Lab "${slug}"`);
     }
 
     // Parse and validate request body
@@ -91,19 +89,13 @@ export async function POST(
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json(
-        { error: "Invalid JSON in request body" },
-        { status: 400 },
-      );
+      return jsonBadRequest("Invalid JSON in request body");
     }
 
     const { code } = body;
 
     if (!code || typeof code !== "string") {
-      return NextResponse.json(
-        { error: '"code" string is required' },
-        { status: 400 },
-      );
+      return jsonBadRequest('"code" string is required');
     }
 
     // Try to proxy to the Docker lab engine (only if explicitly configured)
@@ -133,7 +125,7 @@ export async function POST(
           );
         }
 
-        return NextResponse.json({
+        return jsonOk({
           success: engineResponse.ok,
           output: engineData.output ?? engineData.error ?? "No output",
           executionTime: engineData.executionTime ?? 0,
@@ -157,7 +149,7 @@ export async function POST(
         );
       }
 
-      return NextResponse.json({
+      return jsonOk({
         success: result.success,
         output: result.output,
         executionTime: result.executionTime,
@@ -173,7 +165,7 @@ export async function POST(
       );
     }
 
-    return NextResponse.json({
+    return jsonOk({
       success: true,
       output:
         "This lab requires the Docker lab engine. Set LAB_ENGINE_URL and start Docker services to execute code.",
@@ -182,9 +174,6 @@ export async function POST(
     });
   } catch (error) {
     console.error("Error running lab code:", error);
-    return NextResponse.json(
-      { error: "Failed to run code" },
-      { status: 500 },
-    );
+    return jsonError("Failed to run code");
   }
 }

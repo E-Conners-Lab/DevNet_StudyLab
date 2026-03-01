@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getLab } from "@/lib/data";
+import { jsonOk, jsonNotFound, jsonError } from "@/lib/api-helpers";
 
 export async function GET(
   _request: NextRequest,
@@ -10,18 +11,12 @@ export async function GET(
     const lab = await getLab(slug);
 
     if (!lab) {
-      return NextResponse.json(
-        { error: `Lab "${slug}" not found` },
-        { status: 404 },
-      );
+      return jsonNotFound(`Lab "${slug}"`);
     }
 
-    return NextResponse.json(lab);
+    return jsonOk(lab);
   } catch (error) {
     console.error("Error loading lab:", error);
-    return NextResponse.json(
-      { error: "Failed to load lab" },
-      { status: 500 },
-    );
+    return jsonError("Failed to load lab");
   }
 }

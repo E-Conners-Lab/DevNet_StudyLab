@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getAllFlashcards } from "@/lib/data";
+import { jsonOk, jsonError } from "@/lib/api-helpers";
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,16 +16,13 @@ export async function GET(request: NextRequest) {
       byDomain[card.domainSlug] = (byDomain[card.domainSlug] ?? 0) + 1;
     }
 
-    return NextResponse.json({
+    return jsonOk({
       flashcards,
       total: flashcards.length,
       byDomain,
     });
   } catch (error) {
     console.error("Error loading flashcards:", error);
-    return NextResponse.json(
-      { error: "Failed to load flashcards" },
-      { status: 500 },
-    );
+    return jsonError("Failed to load flashcards");
   }
 }

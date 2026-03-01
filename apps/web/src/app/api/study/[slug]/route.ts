@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { getStudyGuide } from "@/lib/data";
+import { jsonOk, jsonNotFound, jsonError } from "@/lib/api-helpers";
 
 export async function GET(
   _request: NextRequest,
@@ -10,18 +11,12 @@ export async function GET(
     const guide = getStudyGuide(slug);
 
     if (!guide) {
-      return NextResponse.json(
-        { error: `Study guide "${slug}" not found` },
-        { status: 404 },
-      );
+      return jsonNotFound(`Study guide "${slug}"`);
     }
 
-    return NextResponse.json(guide);
+    return jsonOk(guide);
   } catch (error) {
     console.error("Error loading study guide:", error);
-    return NextResponse.json(
-      { error: "Failed to load study guide" },
-      { status: 500 },
-    );
+    return jsonError("Failed to load study guide");
   }
 }

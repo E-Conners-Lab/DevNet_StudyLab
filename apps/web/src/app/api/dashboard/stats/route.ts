@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { getCurrentUserId } from "@/lib/auth-helpers";
 import { getDashboardStats } from "@/lib/data/dashboard";
+import { jsonOk } from "@/lib/api-helpers";
 
 /**
  * GET /api/dashboard/stats
@@ -13,9 +13,9 @@ export async function GET() {
   try {
     const userId = await getCurrentUserId();
     const stats = await getDashboardStats(userId);
-    return NextResponse.json({ stats });
+    return jsonOk({ stats });
   } catch (error) {
     console.error("Error loading dashboard stats:", error);
-    return NextResponse.json({ stats: null });
+    return jsonOk({ stats: null });
   }
 }

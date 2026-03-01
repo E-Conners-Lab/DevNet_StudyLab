@@ -28,6 +28,7 @@ import {
 import CodeMirror from "@uiw/react-codemirror";
 import { python } from "@codemirror/lang-python";
 import { oneDark } from "@codemirror/theme-one-dark";
+import { getDifficultyClasses } from "@/lib/ui-constants";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,16 +62,6 @@ interface RunResult {
   executionTime: number;
   engineAvailable: boolean;
 }
-
-// ---------------------------------------------------------------------------
-// Difficulty badge colors
-// ---------------------------------------------------------------------------
-
-const DIFFICULTY_COLORS: Record<string, string> = {
-  beginner: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  intermediate: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  advanced: "bg-red-500/10 text-red-400 border-red-500/20",
-};
 
 // ---------------------------------------------------------------------------
 // Simple markdown-to-HTML renderer
@@ -338,7 +329,7 @@ export default function LabExecutionPage() {
             variant="secondary"
             className={cn(
               "text-[10px] capitalize",
-              DIFFICULTY_COLORS[lab.difficulty] ?? "bg-zinc-800 text-zinc-400"
+              getDifficultyClasses(lab.difficulty)
             )}
           >
             {lab.difficulty}
