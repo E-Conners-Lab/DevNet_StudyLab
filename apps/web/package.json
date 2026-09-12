@@ -21,7 +21,7 @@
     "db:seed": "tsx scripts/seed-db.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
+    "@anthropic-ai/sdk": "0.125.0",
     "@auth/drizzle-adapter": "^1.11.1",
     "@codemirror/lang-python": "^6.2.1",
     "@codemirror/theme-one-dark": "^6.1.3",

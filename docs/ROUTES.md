@@ -450,7 +450,7 @@ Parameters stored per card per user:
 **Component:** `TutorPage` (Client Component)
 
 ### Purpose
-Conversational AI tutor powered by Claude (claude-sonnet-4-20250514). Students can ask questions about any DevNet exam topic, select a focus domain, and maintain conversation history.
+Conversational AI tutor powered by Claude (claude-opus-5). Students can ask questions about any DevNet exam topic, select a focus domain, and maintain conversation history.
 
 ### Key Components
 

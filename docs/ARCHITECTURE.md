@@ -232,7 +232,7 @@ The chat route:
 1. Validates the API key from environment variables
 2. Validates the incoming message array
 3. Selects a domain-specific system prompt (or the general tutor prompt)
-4. Opens a streaming connection to the Anthropic Claude API (claude-sonnet-4-20250514)
+4. Opens a streaming connection to the Anthropic Claude API (claude-opus-5)
 5. Returns a `text/plain` ReadableStream with chunked transfer encoding
 
 ### FastAPI Lab Engine (port 8100)

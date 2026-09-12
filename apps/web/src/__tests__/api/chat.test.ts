@@ -2,52 +2,44 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock the Anthropic SDK before importing the route
 vi.mock("@anthropic-ai/sdk", () => {
-  const mockStream = {
-    [Symbol.asyncIterator]: async function* () {
-      yield {
-        type: "content_block_delta",
-        delta: { type: "text_delta", text: "Hello" },
-      };
-    },
-  };
-
-  return {
-    default: vi.fn().mockImplementation(() => ({
-      messages: {
-        stream: vi.fn().mockResolvedValue(mockStream),
-      },
-    })),
-  };
+  class MockAnthropic {
+    static APIError = class extends Error {};
+    messages = { stream: vi.fn() };
+  }
+  return { default: MockAnthropic };
 });
 
 // We need to dynamically import the route after setting up env vars
 // because the route reads process.env at call time
-async function importRoute() {
+type StreamEvent = Record<string, unknown>;
+
+const DEFAULT_EVENTS: StreamEvent[] = [
+  { type: "content_block_delta", delta: { type: "text_delta", text: "Hello" } },
+];
+
+async function importRoute(events: StreamEvent[] = DEFAULT_EVENTS) {
   // Clear module cache to get fresh import
   vi.resetModules();
 
-  // Re-mock after reset
-  vi.doMock("@anthropic-ai/sdk", () => {
-    const mockStream = {
-      [Symbol.asyncIterator]: async function* () {
-        yield {
-          type: "content_block_delta",
-          delta: { type: "text_delta", text: "Hello" },
-        };
-      },
-    };
+  const mockStream = {
+    [Symbol.asyncIterator]: async function* () {
+      yield* events;
+    },
+  };
+  const streamMock = vi.fn().mockResolvedValue(mockStream);
 
-    return {
-      default: vi.fn().mockImplementation(() => ({
-        messages: {
-          stream: vi.fn().mockResolvedValue(mockStream),
-        },
-      })),
-    };
+  // Re-mock after reset. A real class is required: the route calls
+  // `new Anthropic(...)` and checks `instanceof Anthropic.APIError`.
+  vi.doMock("@anthropic-ai/sdk", () => {
+    class MockAnthropic {
+      static APIError = class extends Error {};
+      messages = { stream: streamMock };
+    }
+    return { default: MockAnthropic };
   });
 
   const mod = await import("@/app/api/chat/route");
-  return mod;
+  return { ...mod, streamMock };
 }
 
 function createRequest(body: unknown): Request {
@@ -152,5 +144,45 @@ describe("POST /api/chat", () => {
 
     expect(response.status).toBe(400);
     expect(data.error).toContain("role must be");
+  });
+
+  it("calls the current Claude model with adaptive thinking", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST, streamMock } = await importRoute();
+    const request = createRequest({
+      messages: [{ role: "user", content: "What is REST?" }],
+      domain: "apis",
+    });
+
+    const response = await POST(request as never);
+    const text = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(text).toBe("Hello");
+    expect(streamMock).toHaveBeenCalledTimes(1);
+    expect(streamMock.mock.calls[0][0]).toMatchObject({
+      model: "claude-opus-5",
+      thinking: { type: "adaptive" },
+      messages: [{ role: "user", content: "What is REST?" }],
+    });
+    expect(streamMock.mock.calls[0][0].model).not.toMatch(/\d{8}$/);
+  });
+
+  it("appends a notice when the model refuses", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST } = await importRoute([
+      { type: "message_delta", delta: { stop_reason: "refusal" } },
+    ]);
+    const request = createRequest({
+      messages: [{ role: "user", content: "Hello" }],
+    });
+
+    const response = await POST(request as never);
+    const text = await response.text();
+
+    expect(response.status).toBe(200);
+    expect(text).toContain("can't help with that request");
   });
 });

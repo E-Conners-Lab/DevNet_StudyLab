@@ -2,6 +2,19 @@ import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
+ * Current Claude model for the tutor. Pinned as an alias (no date suffix) so
+ * the app tracks the supported release; the prior `claude-sonnet-4-20250514`
+ * snapshot is deprecated.
+ */
+const TUTOR_MODEL = "claude-opus-5";
+
+/** Thinking and the visible reply share this cap on current models. */
+const TUTOR_MAX_TOKENS = 16000;
+
+const REFUSAL_MESSAGE =
+  "\n\nI can't help with that request. Let's get back to DevNet Associate topics.";
+
+/**
  * Helper: create a streaming text Response so the chat UI renders the message
  * the same way it renders normal assistant replies.
  */
@@ -128,7 +141,8 @@ Teaching guidelines:
 - Encourage hands-on practice with Cisco DevNet sandboxes
 - If a student seems confused, try explaining from a different angle
 - Format responses with markdown: use **bold** for key terms, \`code\` for inline code, and code blocks for multi-line code
-- Use numbered or bulleted lists for steps and comparisons`;
+- Use numbered or bulleted lists for steps and comparisons
+- Latency-sensitive: begin your visible answer immediately`;
 
 export async function POST(request: NextRequest) {
   try {
@@ -137,7 +151,7 @@ export async function POST(request: NextRequest) {
     if (!apiKey || apiKey === "your-anthropic-api-key-here") {
       return streamTextResponse(
         "The AI Tutor is not configured yet. To enable it, add your Anthropic API key to .env.local:\n\n" +
-          "TUTOR_ANTHROPIC_KEY=sk-ant-...\n\n" +
+          "TUTOR_ANTHROPIC_KEY=<your Anthropic API key>\n\n" +
           "You can get an API key at https://console.anthropic.com/\n\n" +
           "Once configured, restart the dev server and the AI tutor will be ready to help you study for the DevNet Associate exam."
       );
@@ -177,8 +191,10 @@ export async function POST(request: NextRequest) {
     const client = new Anthropic({ apiKey });
 
     const stream = await client.messages.stream({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 4096,
+      model: TUTOR_MODEL,
+      max_tokens: TUTOR_MAX_TOKENS,
+      thinking: { type: "adaptive" },
+      output_config: { effort: "medium" },
       system: systemPrompt,
       messages: messages.map((m: { role: string; content: string }) => ({
         role: m.role as "user" | "assistant",
@@ -197,6 +213,11 @@ export async function POST(request: NextRequest) {
               event.delta.type === "text_delta"
             ) {
               controller.enqueue(encoder.encode(event.delta.text));
+            } else if (
+              event.type === "message_delta" &&
+              event.delta.stop_reason === "refusal"
+            ) {
+              controller.enqueue(encoder.encode(REFUSAL_MESSAGE));
             }
           }
           controller.close();
