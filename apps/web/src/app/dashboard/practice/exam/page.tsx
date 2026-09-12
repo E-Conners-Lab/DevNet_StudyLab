@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -561,6 +561,7 @@ function ResultsView({
 
 function ExamContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const examId = searchParams.get("examId") ?? "sample-exam-1";
   const domain = searchParams.get("domain");
 
@@ -687,7 +688,7 @@ function ExamContent() {
   }
 
   function handleBack() {
-    window.location.href = "/dashboard/practice";
+    router.push("/dashboard/practice");
   }
 
   // ---- Render states ----
