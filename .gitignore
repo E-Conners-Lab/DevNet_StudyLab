@@ -13,9 +13,14 @@ __pycache__/
 *.pyo
 
 # Environment
-.env
-.env.local
-.env.*.local
+.env*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
 
 # IDE
 .idea/
@@ -39,9 +44,18 @@ docker/postgres/data/
 
 # Python
 .venv/
+.pytest_cache/
 venv/
 *.egg-info/
 
 # Misc
 *.log
 npm-debug.log*
+
+# Retired generated documentation (not distributed)
+docs/manifest.json
+
+# Rebuildable offline runtime assets and release output
+runtime/vendor/
+release/
+release-artifacts/

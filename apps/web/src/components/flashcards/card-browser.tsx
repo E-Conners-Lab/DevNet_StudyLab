@@ -13,7 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getDomainTabItems } from "@/lib/domains";
 import { getDifficultyClasses, getStatusBadge, formatRelativeDate } from "@/lib/ui-constants";
-import type { Flashcard, FlashcardProgress } from "@/lib/flashcards";
+import type { Flashcard, FlashcardProgress } from "@/hooks/use-flashcards";
 
 const DOMAIN_TABS = getDomainTabItems();
 

@@ -10,7 +10,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sparkles, ExternalLink, Keyboard, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDifficultyClasses, getStatusBadge } from "@/lib/ui-constants";
-import type { Flashcard, FlashcardProgress } from "@/lib/flashcards";
+import type { Flashcard, FlashcardProgress } from "@/hooks/use-flashcards";
 
 // ---------------------------------------------------------------------------
 // Constants

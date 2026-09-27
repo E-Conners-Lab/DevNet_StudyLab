@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -46,61 +48,7 @@ interface PastAttempt {
   passed: boolean;
 }
 
-const defaultAttempts: PastAttempt[] = [
-  {
-    id: "1",
-    type: "full",
-    score: 78,
-    totalQuestions: 40,
-    correctAnswers: 31,
-    date: "Feb 25, 2026",
-    timeTaken: "1h 42m",
-    passed: true,
-  },
-  {
-    id: "2",
-    type: "domain",
-    domain: "Understanding & Using APIs",
-    score: 85,
-    totalQuestions: 15,
-    correctAnswers: 13,
-    date: "Feb 23, 2026",
-    timeTaken: "28m",
-    passed: true,
-  },
-  {
-    id: "3",
-    type: "full",
-    score: 62,
-    totalQuestions: 40,
-    correctAnswers: 25,
-    date: "Feb 20, 2026",
-    timeTaken: "1h 55m",
-    passed: false,
-  },
-  {
-    id: "4",
-    type: "domain",
-    domain: "Infrastructure & Automation",
-    score: 53,
-    totalQuestions: 15,
-    correctAnswers: 8,
-    date: "Feb 18, 2026",
-    timeTaken: "32m",
-    passed: false,
-  },
-  {
-    id: "5",
-    type: "domain",
-    domain: "Network Fundamentals",
-    score: 90,
-    totalQuestions: 12,
-    correctAnswers: 11,
-    date: "Feb 15, 2026",
-    timeTaken: "18m",
-    passed: true,
-  },
-];
+const defaultAttempts: PastAttempt[] = [];
 
 /** Format seconds into a human-readable string like "1h 42m" or "28m" */
 function formatTimeTaken(startedAt: string, completedAt: string | null): string {
@@ -133,7 +81,7 @@ export default function PracticePage() {
   const [selectedExam, setSelectedExam] = useState("sample-exam-1");
   const [pastAttempts, setPastAttempts] = useState<PastAttempt[]>(defaultAttempts);
 
-  // Fetch real attempts from API (replaces defaults if DB has data)
+  // Read locally saved attempts
   useEffect(() => {
     fetch("/api/exams/attempts")
       .then((res) => (res.ok ? res.json() : null))
@@ -163,18 +111,18 @@ export default function PracticePage() {
         }
       })
       .catch(() => {
-        // API unavailable — keep hardcoded defaults
+        // Keep empty progress if no saved data is available.
       });
   }, []);
 
   const totalAttempts = pastAttempts.length;
-  const avgScore = Math.round(
+  const avgScore = totalAttempts ? Math.round(
     pastAttempts.reduce((acc, a) => acc + a.score, 0) / totalAttempts
-  );
-  const bestScore = Math.max(...pastAttempts.map((a) => a.score));
-  const passRate = Math.round(
+  ) : null;
+  const bestScore = totalAttempts ? Math.max(...pastAttempts.map((a) => a.score)) : null;
+  const passRate = totalAttempts ? Math.round(
     (pastAttempts.filter((a) => a.passed).length / totalAttempts) * 100
-  );
+  ) : null;
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
@@ -199,19 +147,17 @@ export default function PracticePage() {
         <StatsCard
           icon={Target}
           label="Average Score"
-          value={`${avgScore}%`}
-          trend={{ value: "5%", positive: true }}
+          value={avgScore === null ? "—" : `${avgScore}%`}
         />
         <StatsCard
           icon={Trophy}
           label="Best Score"
-          value={`${bestScore}%`}
+          value={bestScore === null ? "—" : `${bestScore}%`}
         />
         <StatsCard
           icon={CheckCircle2}
           label="Pass Rate"
-          value={`${passRate}%`}
-          trend={{ value: "10%", positive: true }}
+          value={passRate === null ? "—" : `${passRate}%`}
         />
       </div>
 

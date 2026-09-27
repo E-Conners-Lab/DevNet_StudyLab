@@ -27,6 +27,7 @@ export default function FlashcardsPage() {
     dueCards,
     stats,
     isLoading,
+    error,
     reviewCard,
     reviewQueue,
     reviewIndex,
@@ -146,6 +147,8 @@ export default function FlashcardsPage() {
       </div>
     );
   }
+
+  if (error) return <div role="alert" className="text-amber-300">{error}</div>;
 
   // ---- Review Complete Screen ----
   if (isReviewActive && isReviewComplete) {

@@ -1,120 +1,64 @@
-# DevNet StudyLab
+# DevNet StudyLab — final local edition
 
-A full-stack study platform for the **Cisco DevNet Associate (200-901)** certification exam. Built with Next.js, PostgreSQL, and mock Cisco APIs to provide an interactive, hands-on learning experience.
+A downloadable study companion for networking, Python, APIs, and automation. It includes six study guides, 199 spaced-repetition flashcards, two 40-question practice exams, domain quizzes, and seven coding exercises. Your progress stays in your browser, with JSON backup and restore.
 
-## Features
+**This is an unmaintained educational snapshot.** No future fixes, dependency updates, curriculum updates, or support responses are promised. It is designed for one person on a trusted computer, not public hosting. Forks and adaptations are welcome under the [ISC license](LICENSE).
 
-- **Study Hub** -- Track progress across all 6 exam domains with 61 objectives and completion checkboxes
-- **Flashcards** -- SM-2 spaced repetition algorithm with 199 cards across all domains, synced to the database when authenticated
-- **Practice Exams** -- 2 full 40-question practice exams and focused domain quizzes with scoring and attempt history
-- **Study Guides** -- In-depth study guides for all 6 exam domains with objective-level progress tracking
-- **Hands-on Labs** -- 7 labs (Python, REST API, Git, Docker, Bash, Ansible, NETCONF) with a CodeMirror editor featuring syntax highlighting, bracket matching, and autocompletion
-- **AI Tutor** -- Claude-powered conversational tutor with domain-specific system prompts and persistent conversation history
-- **Progress Persistence** -- All study progress saved to PostgreSQL (flashcards, exams, labs, objectives)
-- **Authentication** -- Auth.js v5 with credentials provider and JWT sessions
+The content follows the historical Cisco DevNet Associate 200-901 v1.1 curriculum. Cisco now calls the certification **CCNA Automation**; check [Cisco's current course and exam information](https://www.cisco.com/site/us/en/learn/training-certifications/training/courses/ccnaauto.html) before planning an exam. StudyLab is independent material, not an official Cisco product or a guarantee of current exam coverage or passing results.
 
-## Tech Stack
+## Download and run
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16, React 19, TailwindCSS v4, shadcn/ui, CodeMirror 6, Lucide icons |
-| Backend | Next.js API Routes, Drizzle ORM |
-| Database | PostgreSQL 16 |
-| Auth | Auth.js v5 (NextAuth 5 beta) |
-| AI | Anthropic Claude API |
-| Lab Engine | FastAPI (Python) with sandboxed code execution |
-| Mock APIs | Meraki Dashboard, Catalyst Center, Webex Teams |
-| Testing | Playwright (E2E), Vitest (unit) |
-| Infrastructure | Docker Compose, Gitea (Git labs) |
+1. Download the **prebuilt ZIP asset** from [GitHub Releases](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases), then extract it. GitHub's automatically generated **Source code** ZIP is a developer download and needs a build.
+2. Install [Node.js](https://nodejs.org/en/download) **24.21.0 or later within the 24.x series**. Use an up-to-date supported browser.
+3. Open a terminal in the extracted release folder and run:
 
-## Quick Start
+   ```sh
+   npm start
+   ```
 
-> **macOS**: Install Docker Desktop first (`brew install --cask docker`) and make sure it's running before step 2.
+4. Open **[http://127.0.0.1:4318](http://127.0.0.1:4318)**. Keep the terminal open; press Ctrl+C to stop.
 
-```bash
-# 1. Clone and install
-git clone https://github.com/E-Conners-Lab/DevNet_StudyLab.git devnet-studylab
-cd devnet-studylab
-npm install
-cd apps/web && npm install && cd ../..
+The prebuilt release needs **no npm install, database, Docker, account, or API key**. The launcher serves bundled files only on your computer. Use the exact address above: `localhost` is intentionally not an alias.
 
-# 2. Start PostgreSQL (Docker Desktop must be running)
-docker compose -f docker/docker-compose.yml up -d postgres
+See [SETUP.md](SETUP.md) for source builds, backups, optional AI setup, and troubleshooting. Verification results and remaining release gates belong in [the release review](docs/RELEASE_REVIEW.md); this README is not a certification that every gate has passed.
 
-# 3. Configure environment
-cp apps/web/.env.example apps/web/.env.local
-# Edit .env.local: generate AUTH_SECRET and optionally uncomment
-# TUTOR_ANTHROPIC_KEY with your API key to enable the AI Tutor
-# (see docs/ENVIRONMENT_VARIABLES.md for details)
+## What works locally
 
-# 4. Run migrations and seed data
-cd apps/web
-npm run db:generate
-npm run db:migrate
-npm run db:seed
+- Read the six guides and mark the 61 objectives complete.
+- Review flashcards using spaced repetition.
+- Take full practice exams or domain quizzes and revisit your recent results.
+- Edit and save lab drafts, reveal hints and solutions, and download code.
+- Run supported Python exercises in a separate browser worker using bundled Pyodide. Python cannot run host shell commands or access your computer's files. Network access and arbitrary package installation are unavailable. Exercises involving external APIs need their documented external environment; Git, Docker, Ansible, and device tasks may be simulations rather than real infrastructure operations.
+- Export, import, and reset progress from **Settings**. Browser storage errors are visible; export immediately if changes cannot be saved.
 
-# 5. Start the dev server
-npm run dev
+Core study does not require an internet connection after download. Reference links open external websites only when you choose them. Python execution uses browser resource limits and a watchdog; it is not a hardened environment for running hostile third-party programs.
+
+## Optional AI tutor — bring your own key
+
+The tutor is optional and uses **your own Anthropic account**, API key, and model choice. Provider charges apply. Copy the release-root `.env.example` to `.env`, set `TUTOR_ANTHROPIC_KEY` and `TUTOR_MODEL`, and restart. See [the environment guide](docs/ENVIRONMENT_VARIABLES.md).
+
+Only submitted chat and its conversation context are sent to Anthropic. The key stays in the local launcher; never paste it into the app, a lab, or a backup. Conversations stay in memory and disappear on reload. AI responses can be wrong, and future provider/model availability is not guaranteed. All other study tools work without it.
+
+## Keep your work
+
+Progress is specific to the browser profile and `127.0.0.1:4318` origin. Clearing browser data, using private browsing, or switching browsers/computers can lose it. Use **Settings → Export progress** regularly. Imports replace current progress after validation; export first if you want to keep both versions. Backups include lab drafts, so treat them as your personal files.
+
+Only the previous browser flashcard store can migrate automatically. Old PostgreSQL accounts, exam history, and other database records do not migrate into this edition; retain your old database backup if you used the earlier development stack.
+
+## For people who want to fork it
+
+```sh
+npm ci
+npm ci --prefix apps/web
+npm run release:build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and log in with `student@devnet.lab` / `devnet123`.
+Run these from the source repository root with the supported Node version. The build downloads and verifies pinned Python assets and produces the distributable app; subsequent use of the prebuilt release is offline. Source build and test instructions are in [SETUP.md](SETUP.md).
 
-> **Downloading as ZIP instead of cloning?** Click the green "Code" button on GitHub and select "Download ZIP". After extracting, `cd` into the extracted folder (`DevNet_StudyLab-main`) and continue from `npm install` in step 1.
+- [Architecture](docs/ARCHITECTURE.md)
+- [Local HTTP and browser data contracts](docs/API_REFERENCE.md)
+- [Security and maintenance policy](SECURITY.md)
+- [Optional tutor evaluation and limitations](docs/AI_EVALUATION.md)
+- [Content snapshot](docs/CONTENT_STRATEGY.md)
 
-See [SETUP.md](./SETUP.md) for the full setup guide.
-
-## Project Structure
-
-```
-devnet-studylab/
-  apps/web/              Next.js frontend + API routes
-  content/               Exam blueprint, flashcards, practice exams, labs, study guides
-  docker/                Docker Compose and database init scripts
-  docs/                  Architecture, API reference, routes, schema docs
-  labs/                  Lab solution files
-  scripts/               Database seeding and doc generation scripts
-  services/lab-engine/   FastAPI lab execution engine + mock Cisco APIs
-  tests/                 Content validation tests
-```
-
-## Documentation
-
-- [SETUP.md](./SETUP.md) -- Step-by-step setup guide
-- [apps/web/REFACTOR.md](./apps/web/REFACTOR.md) -- 8-phase codebase refactor: shared modules, extracted components, and migration patterns
-- [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) -- System architecture and design decisions
-- [docs/API_REFERENCE.md](./docs/API_REFERENCE.md) -- Complete API documentation
-- [docs/DATABASE_SCHEMA.md](./docs/DATABASE_SCHEMA.md) -- Database schema reference
-- [docs/ROUTES.md](./docs/ROUTES.md) -- Frontend route map
-- [docs/CONTENT_STRATEGY.md](./docs/CONTENT_STRATEGY.md) -- Content authoring guidelines
-- [docs/ENVIRONMENT_VARIABLES.md](./docs/ENVIRONMENT_VARIABLES.md) -- Environment variable reference
-
-## Running Tests
-
-```bash
-# Unit tests
-cd apps/web && npm test
-
-# E2E tests (starts dev server automatically)
-cd apps/web && npm run test:e2e
-
-# Content validation
-cd apps/web && npm run test:content
-
-# All tests
-cd apps/web && npm run test:all
-```
-
-## Exam Domains (200-901 v1.1)
-
-| # | Domain | Weight |
-|---|--------|--------|
-| 1 | Software Development and Design | 15% |
-| 2 | Understanding and Using APIs | 20% |
-| 3 | Cisco Platforms and Development | 15% |
-| 4 | Application Deployment and Security | 15% |
-| 5 | Infrastructure and Automation | 20% |
-| 6 | Network Fundamentals | 15% |
-
-## License
-
-ISC
+Original project code is ISC licensed. Bundled libraries and Python components retain their own licenses and notices; preserve those when redistributing.

@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "pyodideVersion": "314.0.7",
+  "pythonVersion": "3.14.2",
+  "emscriptenVersion": "5.0.3",
+  "assets": [
+    {
+      "file": "pyodide.mjs",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.mjs",
+      "bytes": 17931,
+      "sha256": "6f1d60f7bf529beb300f0f47983c921d3982363640ba20af0e38efdddbc66109"
+    },
+    {
+      "file": "pyodide.asm.mjs",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.asm.mjs",
+      "bytes": 1250344,
+      "sha256": "f7cdc8ece80678ceb712f8e65ebe6d3a83203a180c399865f49612a051693635"
+    },
+    {
+      "file": "pyodide.asm.wasm",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide.asm.wasm",
+      "bytes": 9598218,
+      "sha256": "cc36e3cab04fdfc9a63ff13eb52eae2b911bf46c025cc7b281f394bd3de1d5e6"
+    },
+    {
+      "file": "python_stdlib.zip",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/python_stdlib.zip",
+      "bytes": 2545637,
+      "sha256": "fa1957e5777068fc4f7437f96d860ae2fbe9c19732ba06c84e004ec16dd7dd7a"
+    },
+    {
+      "file": "pyodide-lock.json",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyodide-lock.json",
+      "bytes": 119077,
+      "sha256": "5dc2fc119108bc148c7457dc86e7675b5c87e1cafd420b9c34c1eaef7b36c010"
+    },
+    {
+      "file": "pyyaml-6.0.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/pyyaml-6.0.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+      "bytes": 112901,
+      "sha256": "a05d2a48c13ed72a8c60c73b30b753a25c3a591bb66c15428b7e95e69a9e806f"
+    },
+    {
+      "file": "jinja2-3.1.6-py3-none-any.whl",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/jinja2-3.1.6-py3-none-any.whl",
+      "bytes": 134899,
+      "sha256": "9330ec9cf2241fb8fc352928ea5e72016bf82de1d3d3b71ffea52a093a3ebab8"
+    },
+    {
+      "file": "markupsafe-3.0.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+      "url": "https://cdn.jsdelivr.net/pyodide/v314.0.7/full/markupsafe-3.0.3-cp314-cp314-pyemscripten_2026_0_wasm32.whl",
+      "bytes": 9986,
+      "sha256": "b44c364dc0d19e4210ce68ab77833c2b5d608f78fe6966263add4fc1fa667d97"
+    }
+  ],
+  "notices": [
+    {
+      "file": "LICENSE-PYODIDE.txt",
+      "url": "https://raw.githubusercontent.com/pyodide/pyodide/314.0.7/LICENSE",
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    {
+      "file": "LICENSE-PYTHON.txt",
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.14.2/LICENSE",
+      "bytes": 13804,
+      "sha256": "b0e25a78cffb43f4d92de8b61ccfa1f1f98ecbc22330b54b5251e7b6ba010231"
+    },
+    {
+      "file": "PYTHON-THIRD-PARTY-LICENSES.rst",
+      "url": "https://raw.githubusercontent.com/python/cpython/v3.14.2/Doc/license.rst",
+      "bytes": 57595,
+      "sha256": "c695d550b135e53e38807e76496d1db17d22c40e461d1f3f354c86188d3305dd"
+    },
+    {
+      "file": "LICENSE-EMSCRIPTEN.txt",
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/LICENSE",
+      "bytes": 5093,
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    },
+    {
+      "file": "LICENSE-MUSL.txt",
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libc/musl/COPYRIGHT",
+      "bytes": 6204,
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af"
+    },
+    {
+      "file": "LICENSE-LIBCXX.txt",
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libcxx/LICENSE.TXT",
+      "bytes": 16703,
+      "sha256": "539dd7aed86e8a4f12cbdd0e6c50c189c7d74847e4fecc64ce2c6ee3a01da38b"
+    },
+    {
+      "file": "LICENSE-LIBCXXABI.txt",
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/5.0.3/system/lib/libcxxabi/LICENSE.TXT",
+      "bytes": 16706,
+      "sha256": "e2b35be49f7284a45b7baca8fc7b3ab7440e7902392b2528a457816b5bb2a15c"
+    },
+    {
+      "file": "LICENSE-LIBFFI.txt",
+      "url": "https://raw.githubusercontent.com/libffi/libffi/f08493d249d2067c8b3207ba46693dd858f95db3/LICENSE",
+      "bytes": 1132,
+      "sha256": "2c9c2acb9743e6b007b91350475308aee44691d96aa20eacef8e199988c8c388"
+    },
+    {
+      "file": "LICENSE-HIWIRE.txt",
+      "url": "https://raw.githubusercontent.com/pyodide/hiwire/6a1e67280a15d929ebeceee54a6358c9c8d5f697/LICENSE",
+      "bytes": 16725,
+      "sha256": "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+    },
+    {
+      "file": "LICENSE-XZ.txt",
+      "url": "https://raw.githubusercontent.com/tukaani-project/xz/v5.2.2/COPYING",
+      "bytes": 2774,
+      "sha256": "c4f8e14fafe458d84808a4cd8b69f94673ebe2bf8fc992291629a69ac12218f8"
+    },
+    {
+      "file": "LICENSE-ZSTD.txt",
+      "url": "https://raw.githubusercontent.com/facebook/zstd/v1.5.7/LICENSE",
+      "bytes": 1549,
+      "sha256": "7055266497633c9025b777c78eb7235af13922117480ed5c674677adc381c9d8"
+    },
+    {
+      "file": "LICENSE-ZLIB.txt",
+      "url": "https://raw.githubusercontent.com/madler/zlib/v1.3.1/LICENSE",
+      "bytes": 1002,
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+    },
+    {
+      "file": "LICENSE-BZIP2.txt",
+      "url": "https://raw.githubusercontent.com/emscripten-ports/bzip2/1.0.6/LICENSE",
+      "bytes": 1901,
+      "sha256": "4919cfb14a73cd64fcef67b107613970cf1659a09aa675dba31314f373bc7204"
+    },
+    {
+      "file": "LICENSE-PYYAML.txt",
+      "url": "https://raw.githubusercontent.com/yaml/pyyaml/6.0.3/LICENSE",
+      "bytes": 1101,
+      "sha256": "8d3928f9dc4490fd635707cb88eb26bd764102a7282954307d3e5167a577e8a4"
+    },
+    {
+      "file": "LICENSE-JINJA2.txt",
+      "url": "https://raw.githubusercontent.com/pallets/jinja/3.1.6/LICENSE.txt",
+      "bytes": 1475,
+      "sha256": "3b49dcee4105eb37bac10faf1be260408fe85d252b8e9df2e0979fc1e094437b"
+    },
+    {
+      "file": "LICENSE-MARKUPSAFE.txt",
+      "url": "https://raw.githubusercontent.com/pallets/markupsafe/3.0.3/LICENSE.txt",
+      "bytes": 1475,
+      "sha256": "489a8e1108509ed98a37bb983e11e0f7e1d31f0bd8f99a79c8448e7ff37d07ea"
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -65,7 +67,7 @@ const labs: Lab[] = [
     category: "python",
     difficulty: "beginner",
     estimatedTime: "45 min",
-    status: "completed",
+    status: "not_started",
     icon: Code2,
   },
   {
@@ -78,7 +80,7 @@ const labs: Lab[] = [
     category: "api",
     difficulty: "intermediate",
     estimatedTime: "60 min",
-    status: "in_progress",
+    status: "not_started",
     icon: Globe,
   },
   {
@@ -130,7 +132,7 @@ const labs: Lab[] = [
     category: "bash",
     difficulty: "beginner",
     estimatedTime: "30 min",
-    status: "completed",
+    status: "not_started",
     icon: TerminalIcon,
   },
   {
@@ -143,7 +145,7 @@ const labs: Lab[] = [
     category: "git",
     difficulty: "beginner",
     estimatedTime: "40 min",
-    status: "completed",
+    status: "not_started",
     icon: GitBranch,
   },
 ];
@@ -190,7 +192,7 @@ export default function LabsPage() {
   const router = useRouter();
   const [labStatuses, setLabStatuses] = useState<Record<string, LabStatus>>({});
 
-  // Fetch lab completion statuses from API (DB overrides hardcoded defaults)
+  // Load local lab completion and draft statuses
   useEffect(() => {
     fetch("/api/labs/attempts")
       .then((res) => (res.ok ? res.json() : null))
@@ -199,7 +201,7 @@ export default function LabsPage() {
           const statusMap: Record<string, LabStatus> = {};
           for (const [slug, attempt] of Object.entries(data.attempts)) {
             const a = attempt as { status: string };
-            // Map DB status to UI status
+            // Map persisted status to the display label
             if (a.status === "completed") statusMap[slug] = "completed";
             else if (a.status === "started") statusMap[slug] = "in_progress";
             else if (a.status === "failed") statusMap[slug] = "in_progress";
@@ -208,11 +210,11 @@ export default function LabsPage() {
         }
       })
       .catch(() => {
-        // API unavailable — keep hardcoded defaults
+        // Keep empty progress if no saved data is available.
       });
   }, []);
 
-  // Merge fetched statuses with hardcoded defaults
+  // Untouched labs start with no progress
   const labsWithStatus = labs.map((lab) => ({
     ...lab,
     status: labStatuses[lab.id] ?? lab.status,

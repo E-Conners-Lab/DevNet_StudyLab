@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useCallback, useRef } from "react";
 
 export interface ChatMessage {
@@ -80,10 +82,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
+          // The route always sends an { error } message on a failure status
+          // (401 sign-in required, 429 rate limited, 400 validation), so prefer
+          // it; the fallbacks only cover a response that carries no body.
           const errorMessage =
             errorData?.error ||
             (response.status === 401
-              ? "API key not configured. Please set TUTOR_ANTHROPIC_KEY."
+              ? "Local session expired. Reload the app to reconnect."
               : response.status === 429
                 ? "Rate limit reached. Please wait a moment and try again."
                 : `Request failed (${response.status})`);

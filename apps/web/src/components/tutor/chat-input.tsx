@@ -66,6 +66,8 @@ export function ChatInput({
             onKeyDown={handleKeyDown}
             placeholder="Ask about DevNet topics..."
             rows={1}
+            maxLength={4000}
+            aria-label="Message to AI tutor"
             className={cn(
               "w-full resize-none rounded-xl border border-zinc-700 bg-zinc-800/50 text-sm text-zinc-100 placeholder:text-zinc-500",
               "focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/50",
@@ -79,6 +81,7 @@ export function ChatInput({
             <TooltipTrigger asChild>
               <Button
                 onClick={onSend}
+                aria-label="Send message"
                 disabled={!input.trim() || isLoading}
                 size="icon"
                 className={cn(

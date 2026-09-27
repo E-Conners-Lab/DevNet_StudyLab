@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useEffect } from "react";
 import {
   Card,
@@ -25,52 +27,11 @@ import {
 } from "lucide-react";
 
 // ---------------------------------------------------------------------------
-// Hardcoded defaults (used when DB is unavailable & for E2E tests)
+// Empty initial state until bundled local progress loads
 // ---------------------------------------------------------------------------
 
-const DEFAULT_PROGRESS: Record<number, { progress: number; stats: DomainData["stats"] }> = {
-  1: { progress: 42, stats: { objectivesCompleted: 5, objectivesTotal: 12, flashcardsDue: 8, labsDone: 2, labsTotal: 4 } },
-  2: { progress: 65, stats: { objectivesCompleted: 9, objectivesTotal: 14, flashcardsDue: 5, labsDone: 4, labsTotal: 6 } },
-  3: { progress: 28, stats: { objectivesCompleted: 3, objectivesTotal: 11, flashcardsDue: 12, labsDone: 1, labsTotal: 5 } },
-  4: { progress: 55, stats: { objectivesCompleted: 6, objectivesTotal: 10, flashcardsDue: 3, labsDone: 3, labsTotal: 5 } },
-  5: { progress: 38, stats: { objectivesCompleted: 5, objectivesTotal: 13, flashcardsDue: 10, labsDone: 2, labsTotal: 6 } },
-  6: { progress: 72, stats: { objectivesCompleted: 8, objectivesTotal: 11, flashcardsDue: 2, labsDone: 3, labsTotal: 4 } },
-};
-
-const defaultDomains: DomainData[] = DEVNET_DOMAINS.map((d) => ({
-  number: d.number,
-  name: d.name,
-  slug: d.slug,
-  weight: d.weight,
-  ...DEFAULT_PROGRESS[d.number],
-}));
-
-const defaultRecentActivity = [
-  {
-    type: "study",
-    text: 'Completed "REST API Fundamentals" objective',
-    time: "2 hours ago",
-    icon: BookOpen,
-  },
-  {
-    type: "lab",
-    text: 'Finished lab: "Python REST Client"',
-    time: "5 hours ago",
-    icon: FlaskConical,
-  },
-  {
-    type: "exam",
-    text: "Practice exam scored 78%",
-    time: "Yesterday",
-    icon: ClipboardCheck,
-  },
-  {
-    type: "study",
-    text: 'Reviewed "YANG Data Models" flashcards',
-    time: "Yesterday",
-    icon: BookOpen,
-  },
-];
+const defaultDomains: DomainData[] = DEVNET_DOMAINS.map(d => ({...d, progress:0, stats:{objectivesCompleted:0, objectivesTotal:0, flashcardsDue:0, labsDone:0, labsTotal:0}}));
+const defaultRecentActivity: {type:string; text:string; time:string; icon:typeof BookOpen}[] = [];
 
 const ACTIVITY_ICON_MAP: Record<string, typeof BookOpen> = {
   study: BookOpen,
@@ -88,10 +49,10 @@ export default function DashboardPage() {
   const [overallProgress, setOverallProgress] = useState(() =>
     Math.round(defaultDomains.reduce((acc, d) => acc + d.progress * (d.weight / 100), 0)),
   );
-  const [bestScore, setBestScore] = useState("85%");
+  const [bestScore, setBestScore] = useState("—");
   const [recentActivity, setRecentActivity] = useState(defaultRecentActivity);
 
-  // Fetch live stats from API (replaces defaults if DB has data)
+  // Read local study statistics
   useEffect(() => {
     fetch("/api/dashboard/stats")
       .then((res) => (res.ok ? res.json() : null))
@@ -120,7 +81,7 @@ export default function DashboardPage() {
         }
       })
       .catch(() => {
-        // API unavailable — keep hardcoded defaults
+        // Keep empty progress if no saved data is available.
       });
   }, []);
 
@@ -132,7 +93,7 @@ export default function DashboardPage() {
           Welcome back
         </h1>
         <p className="text-sm text-zinc-500 mt-1">
-          Track your DevNet Associate 200-901 exam preparation progress
+          Your local progress through the historical DevNet 200-901 curriculum
         </p>
       </div>
 
@@ -142,34 +103,30 @@ export default function DashboardPage() {
           icon={Target}
           label="Overall Progress"
           value={`${overallProgress}%`}
-          trend={{ value: "5%", positive: true }}
         />
         <StatsCard
           icon={Flame}
-          label="Study Streak"
-          value="7 days"
-          trend={{ value: "3 days", positive: true }}
+          label="Objectives completed"
+          value={String(domains.reduce((sum, domain) => sum + domain.stats.objectivesCompleted, 0))}
         />
         <StatsCard
           icon={Trophy}
           label="Best Score"
           value={bestScore}
-          trend={{ value: "12%", positive: true }}
         />
         <StatsCard
           icon={Clock}
-          label="Study Time"
-          value="24h"
-          trend={{ value: "2h", positive: true }}
+          label="Labs completed"
+          value={String(domains.reduce((sum, domain) => sum + domain.stats.labsDone, 0))}
         />
       </div>
 
       {/* Overall Progress Card */}
       <Card className="border-zinc-800 bg-zinc-900/50">
         <CardHeader>
-          <CardTitle className="text-zinc-200">Exam Readiness</CardTitle>
+          <CardTitle className="text-zinc-200">Curriculum Progress</CardTitle>
           <CardDescription>
-            Weighted progress across all six exam domains
+            Completed objectives across all six curriculum domains
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -182,7 +139,7 @@ export default function DashboardPage() {
               className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
             >
               {overallProgress >= 80
-                ? "Exam Ready"
+                ? "Nearly complete"
                 : overallProgress >= 50
                 ? "On Track"
                 : "Keep Going"}

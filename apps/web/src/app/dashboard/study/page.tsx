@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
@@ -20,7 +22,7 @@ import {
   FlaskConical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { DEVNET_DOMAINS } from "@/lib/domains";
+import { blueprint, labs } from "@/lib/local/catalog";
 
 interface Objective {
   id: string;
@@ -36,80 +38,13 @@ interface StudyDomain {
   objectives: Objective[];
 }
 
-/** Exam objectives per domain (content that doesn't live in the canonical domains list) */
-const DOMAIN_OBJECTIVES: Record<number, Objective[]> = {
-  1: [
-    { id: "1.1", title: "Compare data formats (XML, JSON, and YAML)" },
-    { id: "1.2", title: "Describe parsing of common data format to Python data structures" },
-    { id: "1.3", title: "Describe the concepts of test-driven development" },
-    { id: "1.4", title: "Compare software development methods (Agile, Lean, Waterfall)" },
-    { id: "1.5", title: "Explain the benefits of organizing code into methods, functions, classes, and modules" },
-    { id: "1.6", title: "Identify the advantages of common design patterns (MVC and Observer)" },
-    { id: "1.7", title: "Explain the advantages of version control", labSlug: "git-basics" },
-    { id: "1.8", title: "Utilize common version control operations with Git", labSlug: "git-basics" },
-  ],
-  2: [
-    { id: "2.1", title: "Construct a REST API request to accomplish a task given API documentation", labSlug: "rest-api-client" },
-    { id: "2.2", title: "Describe common usage patterns related to webhooks" },
-    { id: "2.3", title: "Identify the constraints when consuming APIs" },
-    { id: "2.4", title: "Explain common HTTP response codes associated with REST APIs" },
-    { id: "2.5", title: "Troubleshoot a problem given the HTTP response code, request and API documentation" },
-    { id: "2.6", title: "Identify the parts of an HTTP response (response code, headers, body)" },
-    { id: "2.7", title: "Utilize common API authentication mechanisms: basic, custom token, and API keys" },
-    { id: "2.8", title: "Compare common API styles (REST, RPC, synchronous, and asynchronous)" },
-    { id: "2.9", title: "Construct a Python script that calls a REST API using the requests library", labSlug: "rest-api-client" },
-  ],
-  3: [
-    { id: "3.1", title: "Construct a Python script that uses a Cisco SDK given SDK documentation" },
-    { id: "3.2", title: "Describe the capabilities of Cisco network management platforms (Meraki, DNA Center, ACI, NSO)" },
-    { id: "3.3", title: "Describe the capabilities of Cisco compute management platforms (UCS Manager, Intersight)" },
-    { id: "3.4", title: "Describe the capabilities of Cisco collaboration platforms (Webex Teams, Webex devices)" },
-    { id: "3.5", title: "Describe the capabilities of Cisco security platforms (Firepower, Umbrella, AMP, ISE, ThreatGrid)" },
-    { id: "3.6", title: "Describe the device level APIs and dynamic interfaces for IOS XE and NX-OS", labSlug: "netconf-basics" },
-    { id: "3.7", title: "Identify the appropriate DevNet resource for a given scenario" },
-  ],
-  4: [
-    { id: "4.1", title: "Describe benefits of edge computing" },
-    { id: "4.2", title: "Identify attributes of different application deployment models (private cloud, public cloud, hybrid cloud, edge)" },
-    { id: "4.3", title: "Identify the attributes of these application deployment types (virtual machines, bare metal, containers)" },
-    { id: "4.4", title: "Describe components for a CI/CD pipeline in application deployments", labSlug: "docker-basics" },
-    { id: "4.5", title: "Construct a Python unit test" },
-    { id: "4.6", title: "Interpret contents of a Dockerfile", labSlug: "docker-basics" },
-    { id: "4.7", title: "Utilize Docker images to create containers", labSlug: "docker-basics" },
-    { id: "4.8", title: "Identify steps needed to integrate an application into a prebuilt CI/CD workflow" },
-  ],
-  5: [
-    { id: "5.1", title: "Describe the value of model driven programmability for infrastructure automation" },
-    { id: "5.2", title: "Compare controller-level to device-level management" },
-    { id: "5.3", title: "Describe the use and roles of network simulation and test tools (pyATS)" },
-    { id: "5.4", title: "Describe the components and benefits of CI/CD pipeline in infrastructure automation" },
-    { id: "5.5", title: "Describe principles of infrastructure as code" },
-    { id: "5.6", title: "Describe the capabilities of automation tools such as Ansible, Puppet, Chef, and Cisco NSO", labSlug: "ansible-network" },
-    { id: "5.7", title: "Identify the workflow being automated by a Python script that uses Cisco APIs including ACI, Meraki, DNA Center, or RESTCONF" },
-    { id: "5.8", title: "Identify the workflow being automated by an Ansible playbook", labSlug: "ansible-network" },
-    { id: "5.9", title: "Identify the workflow being automated by a bash script", labSlug: "bash-scripting" },
-    { id: "5.10", title: "Interpret the results of a RESTCONF or NETCONF query", labSlug: "netconf-basics" },
-  ],
-  6: [
-    { id: "6.1", title: "Describe the purpose and usage of MAC addresses and VLANs" },
-    { id: "6.2", title: "Describe the purpose and usage of IP addresses, routes, subnet mask / prefix, and gateways" },
-    { id: "6.3", title: "Describe the function of common networking components (switches, routers, firewalls, load balancers)" },
-    { id: "6.4", title: "Interpret a basic network topology diagram" },
-    { id: "6.5", title: "Describe the function of management, data, and control planes in a network device" },
-    { id: "6.6", title: "Describe the functionality of these IP services: DHCP, DNS, NAT, SNMP, NTP" },
-    { id: "6.7", title: "Recognize common protocol port numbers (SSH, Telnet, HTTP, HTTPS, NETCONF)" },
-    { id: "6.8", title: "Identify cause of application connectivity issues (NAT problem, Transport port blocked, proxy, VPN)" },
-    { id: "6.9", title: "Explain the impacts of network constraints on applications" },
-  ],
-};
-
-/** Build study domains from canonical DEVNET_DOMAINS + per-domain objectives */
-const studyDomains: StudyDomain[] = DEVNET_DOMAINS.map((d) => ({
-  number: d.number,
-  name: d.name,
-  slug: d.slug,
-  weight: d.weight,
-  objectives: DOMAIN_OBJECTIVES[d.number] ?? [],
+/** Use the same complete curriculum IDs as backups and progress calculations. */
+const studyDomains: StudyDomain[] = blueprint.domains.map(domain => ({
+  ...domain,
+  objectives: domain.objectives.map(objective => ({
+    id: objective.code, title: objective.title,
+    labSlug: labs.find(lab => lab.objectiveCode === objective.code)?.slug,
+  })),
 }));
 
 export default function StudyPage() {
@@ -120,7 +55,7 @@ export default function StudyPage() {
     new Set()
   );
 
-  // Load study progress from API (DB wins over hardcoded defaults)
+  // Load locally saved study progress
   useEffect(() => {
     fetch("/api/study/progress")
       .then((res) => (res.ok ? res.json() : null))
@@ -130,7 +65,7 @@ export default function StudyPage() {
         }
       })
       .catch(() => {
-        // API unavailable — keep hardcoded defaults
+        // Keep empty progress if no saved data is available.
       });
   }, []);
 
@@ -158,7 +93,7 @@ export default function StudyPage() {
       return next;
     });
 
-    // Fire-and-forget: persist to DB via API
+    // Persist locally; the global storage notice surfaces write failures.
     fetch("/api/study/progress", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -285,6 +220,8 @@ export default function StudyPage() {
                         >
                           <button
                             onClick={() => toggleObjective(objective.id)}
+                            aria-label={`${isCompleted ? "Mark incomplete" : "Mark complete"}: ${objective.id}`}
+                            aria-pressed={isCompleted}
                             className="mt-0.5 shrink-0"
                           >
                             {isCompleted ? (
@@ -311,7 +248,7 @@ export default function StudyPage() {
                           </div>
                           {objective.labSlug && (
                             <div className="flex items-center shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <Link href="/dashboard/labs">
+                              <Link href={`/dashboard/labs/${objective.labSlug}`}>
                                 <Button
                                   variant="ghost"
                                   size="icon-xs"

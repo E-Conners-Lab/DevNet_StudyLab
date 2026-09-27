@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -20,7 +19,6 @@ import {
   Layers,
   Bot,
   Settings,
-  LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -61,11 +59,9 @@ interface SidebarProps {
 }
 
 export function Sidebar({ pathname }: SidebarProps) {
-  const { data: session } = useSession();
-
-  const userName = session?.user?.name ?? "Student";
-  const userEmail = session?.user?.email ?? "student@devnet.lab";
-  const initials = userName.charAt(0).toUpperCase();
+  const userName = "Local learner";
+  const userEmail = "Saved in this browser";
+  const initials = "L";
 
   return (
     <div className="flex h-full flex-col bg-zinc-900 border-r border-zinc-800">
@@ -78,7 +74,7 @@ export function Sidebar({ pathname }: SidebarProps) {
           <h1 className="text-base font-bold text-zinc-50 tracking-tight">
             DevNet StudyLab
           </h1>
-          <p className="text-[11px] text-zinc-500 font-medium">200-901 Exam Prep</p>
+          <p className="text-[11px] text-zinc-500 font-medium">Local study edition</p>
         </div>
       </div>
 
@@ -151,15 +147,6 @@ export function Sidebar({ pathname }: SidebarProps) {
             <p className="text-sm font-medium text-zinc-300 truncate">{userName}</p>
             <p className="text-xs text-zinc-500 truncate">{userEmail}</p>
           </div>
-          {session && (
-            <button
-              onClick={() => signOut({ callbackUrl: "/login" })}
-              className="shrink-0 rounded-md p-1.5 text-zinc-500 transition hover:bg-zinc-800 hover:text-zinc-300"
-              title="Sign out"
-            >
-              <LogOut className="h-3.5 w-3.5" />
-            </button>
-          )}
         </div>
       </div>
     </div>

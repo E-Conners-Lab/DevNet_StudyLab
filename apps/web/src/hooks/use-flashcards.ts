@@ -1,5 +1,8 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+import { rateFlashcard, getStudySnapshot } from "@/lib/local/store";
+
 import { useState, useEffect, useCallback, useMemo } from "react";
 
 // ---------------------------------------------------------------------------
@@ -47,67 +50,6 @@ export interface ReviewSessionStats {
 }
 
 // ---------------------------------------------------------------------------
-// localStorage helpers
-// ---------------------------------------------------------------------------
-
-const STORAGE_KEY = "devnet-flashcard-progress";
-
-function loadAllProgress(): Record<string, FlashcardProgress> {
-  if (typeof window === "undefined") return {};
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function saveAllProgress(progress: Record<string, FlashcardProgress>) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-}
-
-// ---------------------------------------------------------------------------
-// SM-2 (client-side copy so the hook is self-contained)
-// ---------------------------------------------------------------------------
-
-function sm2Client(
-  quality: number,
-  repetitions: number,
-  ease: number,
-  interval: number
-) {
-  const q = Math.max(0, Math.min(5, Math.round(quality)));
-  let newReps = repetitions;
-  let newEase = ease;
-  let newInterval = interval;
-
-  if (q >= 3) {
-    if (newReps === 0) newInterval = 1;
-    else if (newReps === 1) newInterval = 6;
-    else newInterval = Math.round(interval * ease);
-    newReps += 1;
-  } else {
-    newReps = 0;
-    newInterval = 1;
-  }
-
-  newEase = ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
-  if (newEase < 1.3) newEase = 1.3;
-  newEase = Math.round(newEase * 100) / 100;
-
-  const nextReview = new Date();
-  nextReview.setDate(nextReview.getDate() + newInterval);
-
-  return {
-    repetitions: newReps,
-    ease: newEase,
-    interval: newInterval,
-    nextReview: nextReview.toISOString(),
-  };
-}
-
-// ---------------------------------------------------------------------------
 // Hook
 // ---------------------------------------------------------------------------
 
@@ -146,45 +88,7 @@ export function useFlashcards() {
     fetchCards();
   }, []);
 
-  // ---- Load progress from localStorage, then merge with API (DB wins) ----
-  useEffect(() => {
-    const local = loadAllProgress();
-    setProgress(local);
-
-    // Attempt to load from API (returns DB progress if authenticated)
-    fetch("/api/flashcards/progress")
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.progress && Object.keys(data.progress).length > 0) {
-          // Merge: API (DB) values take precedence over localStorage
-          const merged = { ...local };
-          for (const [id, dbRecord] of Object.entries(data.progress)) {
-            const rec = dbRecord as {
-              flashcardId: string;
-              ease: number;
-              interval: number;
-              repetitions: number;
-              nextReview: string;
-              lastReview: string;
-            };
-            merged[id] = {
-              flashcardId: rec.flashcardId,
-              ease: rec.ease,
-              interval: rec.interval,
-              repetitions: rec.repetitions,
-              nextReview: rec.nextReview,
-              lastReview: rec.lastReview,
-              quality: (local[id]?.quality ?? 0),
-            };
-          }
-          setProgress(merged);
-          saveAllProgress(merged);
-        }
-      })
-      .catch(() => {
-        // API unavailable — localStorage is the sole source
-      });
-  }, []);
+  useEffect(() => { setProgress(getStudySnapshot().state.flashcards); }, []);
 
   // ---- Derived: cards due for review ----
   const dueCards = useMemo(() => {
@@ -258,23 +162,10 @@ export function useFlashcards() {
   // ---- Rate the current card ----
   const rateCard = useCallback(
     (id: string, quality: number) => {
-      const p = progress[id];
-      const reps = p?.repetitions ?? 0;
-      const ease = p?.ease ?? 2.5;
-      const interval = p?.interval ?? 0;
-
-      const result = sm2Client(quality, reps, ease, interval);
-
-      const updatedProgress: FlashcardProgress = {
-        flashcardId: id,
-        repetitions: result.repetitions,
-        ease: result.ease,
-        interval: result.interval,
-        nextReview: result.nextReview,
-        lastReview: new Date().toISOString(),
-        quality,
-      };
-
+      let updatedProgress: FlashcardProgress;
+      try { updatedProgress = rateFlashcard(id, quality); }
+      catch (err) { setError(err instanceof Error ? err.message : "Progress could not be saved. Export a backup before closing."); return; }
+      const result = updatedProgress;
       const newProgress = { ...progress, [id]: updatedProgress };
 
       // Enqueue ALL state updates first (these always succeed)
@@ -301,25 +192,7 @@ export function useFlashcards() {
       });
       setReviewIndex((prev) => prev + 1);
 
-      // Side effects (may fail — must not block advancement)
-      try {
-        saveAllProgress(newProgress);
-      } catch {
-        // localStorage may be full or blocked — progress still lives in state
-      }
 
-      // Fire-and-forget: sync to DB via API
-      fetch("/api/flashcards/progress", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          flashcardId: id,
-          quality,
-          currentProgress: p ?? null,
-        }),
-      }).catch(() => {
-        // API unavailable — localStorage is the sole source
-      });
     },
     [progress]
   );

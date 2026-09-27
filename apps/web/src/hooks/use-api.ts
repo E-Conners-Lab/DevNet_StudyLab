@@ -1,3 +1,5 @@
+"use client";
+import { localFetch as fetch } from "@/lib/local/client";
 import { useState, useEffect, useCallback, useRef } from "react";
 
 interface UseApiOptions<T> {

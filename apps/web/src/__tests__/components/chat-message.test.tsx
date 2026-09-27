@@ -187,3 +187,18 @@ describe("ChatMessage", () => {
     expect(screen.getByText("What is a REST API?")).toBeInTheDocument();
   });
 });
+
+describe('untrusted AI output', () => {
+  it('renders provider HTML literally without executable elements or handlers', () => {
+    const content = '<img src=x onerror="alert(1)"><script>alert(2)</script>';
+    const {container} = render(<ChatMessage role="assistant" content={content} timestamp={new Date()} />);
+    expect(container.textContent).toContain(content);
+    expect(container.querySelector('img,script,[onerror]')).toBeNull();
+  });
+  it('keeps hostile markup in fenced code as inert code text', () => {
+    const content = '```html\n<iframe src="javascript:alert(1)"></iframe>\n```';
+    const {container} = render(<ChatMessage role="assistant" content={content} timestamp={new Date()} />);
+    expect(container.querySelector('code')?.textContent).toContain('<iframe');
+    expect(container.querySelector('iframe')).toBeNull();
+  });
+});

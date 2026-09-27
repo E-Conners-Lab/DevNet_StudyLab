@@ -11,10 +11,13 @@ export default defineConfig({
     exclude: ["node_modules", ".next"],
     coverage: {
       provider: "v8",
+      thresholds: {statements:80, branches:80, functions:80, lines:80},
       reporter: ["text", "json", "html"],
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
         "src/**/*.test.{ts,tsx}",
+        "src/**/*.spec.{ts,tsx}",
+        "src/**/__tests__/**",
         "src/**/*.d.ts",
         "src/components/ui/**",
       ],
