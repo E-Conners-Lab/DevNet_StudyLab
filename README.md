@@ -8,7 +8,7 @@ The content follows the historical Cisco DevNet Associate 200-901 v1.1 curriculu
 
 ## Download and run
 
-1. Download the **prebuilt ZIP asset** from [GitHub Releases](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases), then extract it. GitHub's automatically generated **Source code** ZIP is a developer download and needs a build.
+1. Download **[devnet-studylab-1.0.0.zip](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases/download/v1.0.0/devnet-studylab-1.0.0.zip)** from the [published v1.0.0 release](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases/tag/v1.0.0), then extract it. GitHub's automatically generated **Source code** ZIP is a developer download and needs a build.
 2. Install [Node.js](https://nodejs.org/en/download) **24.21.0 or later within the 24.x series**. Use an up-to-date supported browser.
 3. Open a terminal in the extracted release folder and run:
 
@@ -20,7 +20,9 @@ The content follows the historical Cisco DevNet Associate 200-901 v1.1 curriculu
 
 The prebuilt release needs **no npm install, database, Docker, account, or API key**. The launcher serves bundled files only on your computer. Use the exact address above: `localhost` is intentionally not an alias.
 
-See [SETUP.md](SETUP.md) for source builds, backups, optional AI setup, and troubleshooting. Verification results and remaining release gates belong in [the release review](docs/RELEASE_REVIEW.md); this README is not a certification that every gate has passed.
+See [SETUP.md](SETUP.md) for source builds, backups, optional AI setup, and troubleshooting. The [published release notes](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases/tag/v1.0.0) record the final verification results and link to the passing CI and CodeQL runs. The [release review](docs/RELEASE_REVIEW.md) is the earlier preparation record; its pending-publication checklist is superseded by those release notes.
+
+Release verification covered macOS ARM64 and Ubuntu with Chromium/Chrome, including the packaged app and browser Python runner. Windows, Firefox, and Safari have not been tested. A live Anthropic tutor connectivity check passed; it does not establish comprehensive AI answer quality or safety.
 
 ## What works locally
 
