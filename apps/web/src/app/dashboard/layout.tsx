@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { StorageNotice } from "@/components/dashboard/storage-notice";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -58,6 +59,7 @@ export default function DashboardLayout({
       <main className="flex-1 min-w-0">
         <ScrollArea className="h-screen">
           <div className="md:p-8 p-4 pt-[72px] md:pt-8">
+            <StorageNotice />
             {children}
           </div>
         </ScrollArea>

@@ -1,3 +1,5 @@
+> Historical development notes. The final local edition replaces the account/database/API architecture described below. Use [the current architecture](../../docs/ARCHITECTURE.md) and [setup guide](../../SETUP.md) for this release. No further refactor phases or maintenance are promised.
+
 # DevNet StudyLab -- 8-Phase Refactor
 
 **Branch:** `feature/full-refactor`

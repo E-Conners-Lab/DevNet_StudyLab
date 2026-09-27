@@ -1,265 +1,97 @@
-# DevNet StudyLab -- Setup Guide
+# Setup — final local edition
 
-Complete setup instructions from a fresh clone to a running development environment.
+This guide describes the downloadable local edition. Accounts, PostgreSQL, Docker, and the old server-side Python execution service are not part of this edition.
 
-## Prerequisites
+## Run the prebuilt release
 
-| Tool | Version | Purpose |
-|------|---------|---------|
-| Node.js | 20+ | JavaScript runtime |
-| npm | 10+ | Package management |
-| Docker | 24+ | PostgreSQL and lab services |
-| Docker Compose | 2.20+ | Multi-container orchestration |
-| Git | 2.40+ | Version control |
+Install Node.js **24.21.0 or later within 24.x** and a current browser. Download and extract the prebuilt ZIP from [Releases](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases). Open a terminal in the folder containing `package.json` and run:
 
-**macOS users**: The easiest way to install Docker is via [Docker Desktop](https://www.docker.com/products/docker-desktop/), which includes both Docker and Docker Compose:
-
-```bash
-brew install --cask docker
+```sh
+npm start
 ```
 
-After installing, **open the Docker Desktop app** and wait for it to finish starting (the whale icon in the menu bar should stop animating). Docker commands will not work until the Docker Desktop daemon is running.
+You can also invoke the launcher directly:
 
-Optional:
-- **Python 3.11+** -- Only needed if developing the lab engine locally (instead of via Docker)
-
-## Step 1: Clone and Install Dependencies
-
-**Option A: Git clone (recommended)**
-
-```bash
-git clone https://github.com/E-Conners-Lab/DevNet_StudyLab.git devnet-studylab
-cd devnet-studylab
-
-# Install root dependencies
-npm install
-
-# Install web app dependencies
-cd apps/web
-npm install
-cd ../..
+```sh
+node runtime/start.mjs
 ```
 
-**Option B: Download ZIP**
+Open [http://127.0.0.1:4318](http://127.0.0.1:4318). The separate Python runner uses `127.0.0.1:4319`. Both ports must be free. Keep the terminal running and use Ctrl+C to stop. No package installation or network connection is required for core study in this prebuilt package.
 
-If you don't have Git installed, click the green **Code** button on the GitHub repo page and select **Download ZIP**. Extract the archive and open a terminal in the extracted folder:
+Do not open the HTML files with `file://`, change the hostname to `localhost`, expose the ports to a network, or place the app behind a public tunnel. The two exact origins are part of the browser isolation boundary.
 
-```bash
-cd DevNet_StudyLab-main
+## Enable optional AI tutoring
 
-# Install root dependencies
-npm install
+You need an Anthropic API account, an API key, and a model available to your account. API usage may incur charges independently of a chat subscription.
 
-# Install web app dependencies
-cd apps/web
-npm install
-cd ../..
+From the extracted release root, copy the example configuration:
+
+```sh
+cp .env.example .env
 ```
 
-## Step 2: Start PostgreSQL
+On Windows PowerShell, use `Copy-Item .env.example .env` instead. Edit `.env` locally and set `TUTOR_ANTHROPIC_KEY` and `TUTOR_MODEL`. Use a model ID from [Anthropic's model documentation](https://platform.claude.com/docs/en/models/overview). Both values are required; the app deliberately supplies no permanently promised default model.
 
-The database runs in Docker. Make sure Docker Desktop is running first (macOS: open the Docker Desktop app), then start PostgreSQL:
+Restart StudyLab with `npm start`. Environment variables already set in the launching process take precedence over `.env`. Never commit, upload, or share `.env`; never paste the key into chat or a lab. Remove the key and restart to turn tutoring off.
 
-```bash
-docker compose -f docker/docker-compose.yml up -d postgres
+The tutor sends submitted chat and recent conversation context to Anthropic. Conversations remain in browser memory and are excluded from progress backups. Core study still works if the key is missing, the provider is unavailable, or a model is retired. Local request limits reduce accidental bursts but are not a monetary spending cap: set account limits with the provider.
+
+## Save, back up, and restore
+
+Objective completion, flashcard scheduling, the latest 100 exam attempts, lab drafts/completion, and preferences are stored in your browser profile. Drafts are limited to 128 KiB each; backup imports are limited to 2 MiB.
+
+- In **Settings**, select **Export progress** and keep the downloaded JSON somewhere safe.
+- To move to another browser or computer, launch the same edition and import that file through **Settings**. Import replaces the destination progress after full validation.
+- Unsupported schema/content versions, unknown curriculum IDs, and malformed backups are rejected. An invalid import does not erase your current progress.
+- If storage is full or unavailable, the page retains recoverable changes in memory and shows a warning. Export before closing or reloading.
+- **Reset progress** clears this edition's progress after confirmation. Export first if you may need it later.
+
+The old `devnet-flashcard-progress` browser entry is migrated only when no new-format progress exists. The old entry remains unchanged. Old database records do not migrate; keep a separate backup of that database rather than running destructive reset commands.
+
+Use one study tab for edits. Tabs do not synchronize: a save checks whether stored progress changed since the tab loaded and stops on a detected conflict. Export the unsaved tab before reloading; import/reset also require a reload after a conflict. Backups include your lab text and are not encrypted. Do not enter real secrets or confidential information into exercises.
+
+## Build from source
+
+The GitHub **Code → Download ZIP** and **Source code** release assets contain source, not a ready-to-run app. Extract them, then run these commands from the repository root:
+
+```sh
+npm ci
+npm ci --prefix apps/web
+npm run release:build
 ```
 
-Verify it's healthy:
+The build requires internet access for npm packages and any uncached, pinned Python assets. Python runtime files are checked against the committed integrity manifest. The output is the release artifact to run or redistribute; follow the build output for its location. Do not distribute a developer checkout containing `.env`, caches, test traces, or personal data.
 
-```bash
-docker compose -f docker/docker-compose.yml ps
-# Should show studylab-db as "healthy"
-```
+Checks available to contributors:
 
-Default connection: `postgresql://studylab:studylab_dev_2024@localhost:5432/studylab`
-
-## Step 3: Configure Environment Variables
-
-Create the environment file:
-
-```bash
-cp apps/web/.env.example apps/web/.env.local
-```
-
-Edit `apps/web/.env.local` with your values:
-
-```env
-# Required -- PostgreSQL connection string
-DATABASE_URL=postgresql://studylab:studylab_dev_2024@localhost:5432/studylab
-
-# Required -- Auth.js session encryption key
-# Generate with: openssl rand -base64 32
-AUTH_SECRET=your-generated-secret-here
-
-# Optional -- Enables the AI Tutor feature
-# To enable the AI Tutor, remove the leading "#" from the line below
-# and replace with your Anthropic API key (get one at https://console.anthropic.com/)
-TUTOR_ANTHROPIC_KEY=sk-ant-...
-```
-
-> **Tip:** In the `.env.example` file, `TUTOR_ANTHROPIC_KEY` is commented out with a `#` at the start of the line. To enable it, delete the `#` and the space after it, then paste your actual API key after the `=` sign.
-
-See [docs/ENVIRONMENT_VARIABLES.md](./docs/ENVIRONMENT_VARIABLES.md) for the full variable reference.
-
-## Step 4: Run Database Migrations and Seed
-
-```bash
-cd apps/web
-
-# Generate migration files from the Drizzle schema
-npm run db:generate
-
-# Apply migrations to PostgreSQL
-npm run db:migrate
-
-# Seed content data (domains, objectives, flashcards, exams, labs)
-# Also creates the default dev user: student@devnet.lab / devnet123
-npm run db:seed
-```
-
-## Step 5: Start the Development Server
-
-```bash
-cd apps/web
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-Log in with:
-- **Email:** `student@devnet.lab`
-- **Password:** `devnet123`
-
-## Step 6: Start Lab Services (Optional)
-
-The hands-on labs require the lab engine and mock APIs. Start all Docker services:
-
-```bash
-docker compose -f docker/docker-compose.yml up -d
-```
-
-This starts:
-
-| Service | Port | Purpose |
-|---------|------|---------|
-| PostgreSQL | 5432 | Database |
-| Lab Engine | 8100 | Code execution sandbox |
-| Mock Meraki | 8201 | Meraki Dashboard API simulator |
-| Mock Catalyst | 8202 | Catalyst Center API simulator |
-| Mock Webex | 8203 | Webex Teams API simulator |
-| Gitea | 3001 | Git server for Git labs |
-
-Each mock platform runs as its own service on the port above, and is *also*
-mounted inside the lab engine under `/mock/<platform>` (e.g.
-`http://localhost:8100/mock/meraki/api/v1/organizations`). Either address works.
-
-Verify the stack is up - all services except Gitea report a health status:
-
-```bash
-docker compose -f docker/docker-compose.yml ps
-```
-
-To let labs execute code in the container sandbox rather than a local `python3`,
-point the app at the lab engine. This must be the **full endpoint URL**, not just
-the host:
-
-```bash
-# apps/web/.env.local
-LAB_ENGINE_URL=http://localhost:8100/api/v1/sandbox/run
-```
-
-Bash, Docker and Ansible labs require this; without it they report that the lab
-engine is needed.
-
-## Running Without Docker
-
-The app works without Docker or PostgreSQL. When `DATABASE_URL` is unset:
-
-- All content loads from JSON files in `content/`
-- Flashcard progress uses localStorage only
-- Exam/lab/study progress is not persisted between sessions
-- Authentication is bypassed (no login required)
-
-This mode is used for E2E testing and quick development.
-
-## Running Tests
-
-```bash
-cd apps/web
-
-# Unit tests (Vitest)
+```sh
 npm test
-
-# E2E tests (Playwright -- starts its own dev server)
-npm run test:e2e
-
-# Content validation (checks JSON content files)
-npm run test:content
-
-# Coverage report
-npm run test:coverage
-
-# All unit + content tests
-npm run test:all
+npm run test:content --prefix apps/web
+npm run test:coverage --prefix apps/web
+npm run lint --prefix apps/web
+node --test runtime/tests/*.test.mjs
+npx --prefix apps/web playwright install chromium
+npm run test:e2e --prefix apps/web
+npm run test:sandbox
+npm run test:tutor-browser
 ```
 
-The lab engine has its own Python suite. It runs in a container, so no local
-Python setup is required:
-
-```bash
-# from the repo root
-docker run --rm -v "$PWD/services/lab-engine:/app" -w /app python:3.12-slim \
-  sh -c 'pip install -q -r requirements-dev.txt && python -m pytest tests/ -v'
-```
-
-Two repo-level checks CI also runs:
-
-```bash
-# requirements.txt pins must match requirements.lock.txt (the image installs the lock)
-python3 scripts/check-lock-drift.py
-
-# every route, page, table and Python endpoint must be documented
-cd apps/web && npm run docs:validate
-```
-
-## Drizzle Studio
-
-Browse the database visually:
-
-```bash
-cd apps/web
-npm run db:studio
-```
-
-Opens a web UI at [https://local.drizzle.studio](https://local.drizzle.studio).
+Browser verification must target the built release and its local launcher. See [the release review](docs/RELEASE_REVIEW.md) for the exact commands/results used for the final artifact. A passing source test alone does not establish that a packaged download contains every required asset.
 
 ## Troubleshooting
 
-### Port 5432 already in use
+To check a download, compare the ZIP's SHA-256 with the accompanying `SHA256SUMS.txt`. On macOS use `shasum -a 256 devnet-studylab-1.0.0.zip`; on Linux use `sha256sum devnet-studylab-1.0.0.zip`; on Windows PowerShell use `Get-FileHash devnet-studylab-1.0.0.zip -Algorithm SHA256`. These checks detect corruption; an unsigned checksum is not proof of publisher identity. The launcher also verifies the extracted files before starting.
 
-Another PostgreSQL instance is running. Either stop it or change the port in `docker-compose.yml`:
+**“Unsupported Node version.”** Run `node --version` in the same terminal. Use Node 24.21.0 or a later patched 24.x release; reopen the terminal after installation.
 
-```yaml
-ports:
-  - "5433:5432"  # Use port 5433 instead
-```
+**Missing build or runtime files.** Extract the complete prebuilt release ZIP. A source ZIP needs the build steps above. Do not use files from two different releases together.
 
-Then update `DATABASE_URL` in `.env.local` to use port 5433.
+**Port already in use.** Stop the earlier StudyLab process with Ctrl+C or identify the application using ports 4318/4319. Do not terminate unrelated processes or change the configured origins to work around this.
 
-### Migration errors
+**Page denied or runner will not connect.** Use exactly `http://127.0.0.1:4318`. Keep both launcher listeners available. Browser extensions or managed-browser policies may block workers/Wasm; reading, flashcards, and downloadable code remain useful without the runner.
 
-If migrations fail, reset the database:
+**Python reports an unavailable module or blocked network request.** Only bundled packages are supported. No `pip`/CDN installation or external API access is available inside the browser runner. Use the exercise's instructions and download option where a separate environment is required.
 
-```bash
-docker compose -f docker/docker-compose.yml down -v
-docker compose -f docker/docker-compose.yml up -d postgres
-cd apps/web && npm run db:generate && npm run db:migrate && npm run db:seed
-```
+**Tutor unavailable or rate limited.** Check both local environment variables, model access, provider account/usage limits, and connectivity. Restart after configuration changes. Wait at least one minute after a local rate limit; start a new conversation when the context limit is reached. Do not share your key in a bug report.
 
-### E2E tests fail with login redirect
-
-Make sure `reuseExistingServer` is `false` in `playwright.config.ts` and no other dev server is running on port 3000. Playwright needs to start its own server with `SKIP_AUTH=true`.
-
-### AI Tutor shows "API key not configured"
-
-Set `TUTOR_ANTHROPIC_KEY` in `apps/web/.env.local`. The tutor page still loads without it; you just cannot send messages. (This variable is intentionally named `TUTOR_ANTHROPIC_KEY` rather than `ANTHROPIC_API_KEY` to avoid conflicts with the Claude Code CLI environment.)
+There is no maintained help desk or promised response time for this snapshot.

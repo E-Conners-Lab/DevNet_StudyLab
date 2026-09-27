@@ -1,21 +1,25 @@
 {
   "name": "devnet-studylab",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs",
-    "test": "tests"
-  },
+  "description": "Self-contained local study tools with optional bring-your-own-key AI tutoring",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node runtime/start.mjs",
+    "release:build": "node scripts/build-release.mjs",
+    "test:runtime": "node --test --experimental-test-coverage --test-coverage-include=runtime/*.mjs --test-coverage-exclude=runtime/start.mjs --test-coverage-exclude=runtime/*.test.mjs --test-coverage-lines=80 --test-coverage-branches=80 --test-coverage-functions=80 runtime/tests/*.test.mjs runtime/prepare-python.test.mjs runtime/sandbox/controller.test.mjs scripts/zip-release.test.mjs",
+    "test:sandbox": "node runtime/sandbox/browser-check.mjs",
+    "test": "npm run test:runtime && npm run test:all --prefix apps/web",
+    "test:tutor-browser": "node runtime/browser-tutor-check.mjs"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "typescript": "^5.9.3",
+    "typescript": "5.9.3",
     "vitest": "4.1.11"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=24.21.0 <25"
   }
 }

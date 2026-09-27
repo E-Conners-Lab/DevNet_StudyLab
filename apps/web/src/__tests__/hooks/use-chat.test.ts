@@ -3,8 +3,8 @@ import { renderHook, act, waitFor } from "@testing-library/react";
 import { useChat } from "@/hooks/use-chat";
 
 // Mock global fetch
-const mockFetch = vi.fn();
-global.fetch = mockFetch;
+const { mockFetch } = vi.hoisted(() => ({mockFetch:vi.fn()}));
+vi.mock("@/lib/local/client", () => ({localFetch:mockFetch}));
 
 describe("useChat", () => {
   beforeEach(() => {
@@ -140,7 +140,7 @@ describe("useChat", () => {
     expect(result.current.messages).toEqual([]);
   });
 
-  it("falls back to a sign-in message for a 401 with no body", async () => {
+  it("falls back to a local reconnection message for a 401 with no body", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: false,
       status: 401,
@@ -155,7 +155,7 @@ describe("useChat", () => {
 
     // A 401 from /api/chat means "not signed in" - the route requires a session.
     // A missing API key is reported as a chat message with a 200 instead.
-    expect(result.current.error).toBe("Please sign in to use the AI tutor.");
+    expect(result.current.error).toBe("Local session expired. Reload the app to reconnect.");
   });
 
   it("prefers the server's own error message over the status fallback", async () => {

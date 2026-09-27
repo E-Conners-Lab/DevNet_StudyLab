@@ -1,16 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import { AuthSessionProvider } from "@/components/providers/session-provider";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "DevNet StudyLab",
-  description: "Master the Cisco DevNet Associate 200-901 exam",
+  description: "Local supplementary study tools based on historical Cisco DevNet 200-901 objectives",
 };
 
 export default function RootLayout({
@@ -20,8 +14,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} font-sans antialiased`}>
-        <AuthSessionProvider>{children}</AuthSessionProvider>
+      <body className="font-sans antialiased">
+        {children}
       </body>
     </html>
   );

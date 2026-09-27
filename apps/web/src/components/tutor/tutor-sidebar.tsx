@@ -183,6 +183,7 @@ export function TutorSidebar({
                   </div>
                   <button
                     onClick={(e) => onDeleteConversation(conv.id, e)}
+                    aria-label={`Delete conversation: ${conv.title}`}
                     className="opacity-0 group-hover:opacity-100 shrink-0 p-1 rounded hover:bg-zinc-700/50 transition-opacity"
                   >
                     <Trash2 className="h-3.5 w-3.5 text-zinc-500 hover:text-red-400" />

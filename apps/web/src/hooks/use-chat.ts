@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useCallback, useRef } from "react";
 
 export interface ChatMessage {
@@ -86,7 +88,7 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
           const errorMessage =
             errorData?.error ||
             (response.status === 401
-              ? "Please sign in to use the AI tutor."
+              ? "Local session expired. Reload the app to reconnect."
               : response.status === 429
                 ? "Rate limit reached. Please wait a moment and try again."
                 : `Request failed (${response.status})`);

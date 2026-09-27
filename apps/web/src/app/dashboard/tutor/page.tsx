@@ -1,5 +1,7 @@
 "use client";
 
+import { localFetch as fetch } from "@/lib/local/client";
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -120,7 +122,7 @@ export default function TutorPage() {
   // Track the conversation ID that a pending message-save should target.
   const pendingConvIdRef = useRef<string | null>(null);
 
-  // Load conversations from DB on mount
+  // Load this page session's temporary conversations
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -140,7 +142,7 @@ export default function TutorPage() {
         );
         setConversations(loaded);
       } catch {
-        // DB not available — that's fine, start with empty
+        // Conversation memory is optional; study tools remain available.
       }
     })();
     return () => { cancelled = true; };
@@ -225,7 +227,7 @@ export default function TutorPage() {
     setSidebarOpen(false);
   }, [clearMessages]);
 
-  // Switch conversation — load messages from DB
+  // Switch conversation — read temporary in-memory messages
   const handleSelectConversation = useCallback(
     async (conv: Conversation) => {
       setSidebarOpen(false);
@@ -370,6 +372,7 @@ export default function TutorPage() {
               </div>
               <div>
                 <h1 className="text-sm font-semibold text-zinc-200">AI Tutor</h1>
+                <p className="text-xs text-zinc-400">Optional Anthropic BYOK · Messages are sent to Anthropic · Setup in Settings</p>
                 <p className="text-[11px] text-zinc-500">DevNet 200-901</p>
               </div>
             </div>
