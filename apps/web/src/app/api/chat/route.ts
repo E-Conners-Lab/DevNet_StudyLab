@@ -1,5 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { getCurrentUserId, isAuthBypassed } from "@/lib/auth-helpers";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
+import { jsonUnauthorized, jsonTooManyRequests } from "@/lib/api-helpers";
 
 /**
  * Current Claude model for the tutor. Pinned as an alias (no date suffix) so
@@ -146,6 +149,33 @@ Teaching guidelines:
 
 export async function POST(request: NextRequest) {
   try {
+    // Every call to this route spends Anthropic tokens, so it is gated on a
+    // real session and rate limited per user. When auth is bypassed (E2E runs,
+    // or local single-user use with no database) there is no account to check,
+    // so the limit is keyed on the shared local caller instead.
+    const userId = await getCurrentUserId();
+
+    if (!userId && !isAuthBypassed()) {
+      return jsonUnauthorized("Sign in to use the AI tutor.");
+    }
+
+    // The limit is charged before body validation and before the API-key check,
+    // so a flood of malformed requests cannot be used to probe the endpoint for
+    // free. The cost is that 10 bad requests also lock out a legitimate one for
+    // a minute, which is the right trade for an endpoint that spends money.
+    const rateLimitKey = `tutor:${userId ?? "local"}`;
+    const { allowed, retryAfterSeconds } = checkRateLimit(
+      rateLimitKey,
+      RATE_LIMITS.tutor,
+    );
+
+    if (!allowed) {
+      return jsonTooManyRequests(
+        retryAfterSeconds,
+        `You have reached the tutor request limit. Try again in ${retryAfterSeconds}s.`,
+      );
+    }
+
     const apiKey = process.env.TUTOR_ANTHROPIC_KEY;
 
     if (!apiKey || apiKey === "your-anthropic-api-key-here") {

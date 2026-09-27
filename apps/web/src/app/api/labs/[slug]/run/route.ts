@@ -5,8 +5,16 @@ import { tmpdir } from "os";
 import path from "path";
 import { randomUUID } from "crypto";
 import { getLabForRun, saveLabAttempt } from "@/lib/data";
-import { getCurrentUserId } from "@/lib/auth-helpers";
-import { jsonOk, jsonNotFound, jsonBadRequest, jsonError } from "@/lib/api-helpers";
+import { getCurrentUserId, isAuthBypassed } from "@/lib/auth-helpers";
+import {
+  jsonOk,
+  jsonNotFound,
+  jsonBadRequest,
+  jsonError,
+  jsonUnauthorized,
+  jsonTooManyRequests,
+} from "@/lib/api-helpers";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/rate-limit";
 
 // ---------------------------------------------------------------------------
 // Lab types that can be executed as Python scripts
@@ -77,6 +85,28 @@ export async function POST(
   { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
+    // This route executes caller-supplied code - in the lab-engine container
+    // when one is configured, otherwise in a `python3` subprocess on this host.
+    // It is therefore the most privileged endpoint in the app and is gated
+    // before anything else happens, including the lab lookup.
+    const userId = await getCurrentUserId();
+
+    if (!userId && !isAuthBypassed()) {
+      return jsonUnauthorized("Sign in to run labs.");
+    }
+
+    const { allowed, retryAfterSeconds } = checkRateLimit(
+      `labRun:${userId ?? "local"}`,
+      RATE_LIMITS.labRun,
+    );
+
+    if (!allowed) {
+      return jsonTooManyRequests(
+        retryAfterSeconds,
+        `Too many lab runs. Try again in ${retryAfterSeconds}s.`,
+      );
+    }
+
     const { slug } = await params;
     const lab = getLabForRun(slug);
 
@@ -117,7 +147,6 @@ export async function POST(
         const engineData = await engineResponse.json();
 
         // Fire-and-forget: save lab attempt to DB
-        const userId = await getCurrentUserId();
         if (userId) {
           const status = engineResponse.ok ? "completed" : "failed";
           saveLabAttempt(userId, slug, status, code).catch((err) =>
@@ -141,7 +170,6 @@ export async function POST(
       const result = await runPythonLocally(code);
 
       // Fire-and-forget: save lab attempt to DB
-      const userId = await getCurrentUserId();
       if (userId) {
         const status = result.success ? "completed" : "failed";
         saveLabAttempt(userId, slug, status, code).catch((err) =>
@@ -158,7 +186,6 @@ export async function POST(
     }
 
     // Non-Python labs need Docker
-    const userId = await getCurrentUserId();
     if (userId) {
       saveLabAttempt(userId, slug, "started", code).catch((err) =>
         console.warn("Background lab attempt save failed:", err),

@@ -29,6 +29,7 @@
 |------|-----------|------|---------|
 | `/` | `app/page.tsx` | Server | Redirect to `/dashboard` |
 | `/login` | `app/login/page.tsx` | Client | Authentication login form |
+| `/signup` | `app/signup/page.tsx` | Client | Account creation form |
 | `/dashboard` | `app/dashboard/page.tsx` | Client | Main dashboard with progress overview |
 | `/dashboard/study` | `app/dashboard/study/page.tsx` | Client | Study hub with domains and objectives |
 | `/dashboard/study/[slug]` | `app/dashboard/study/[slug]/page.tsx` | Client | Domain study guide with topics and resources |
@@ -46,6 +47,7 @@
 app/layout.tsx (root -- html, body, metadata, SessionProvider)
   app/page.tsx (redirect to /dashboard)
   app/login/page.tsx
+  app/signup/page.tsx
   app/dashboard/layout.tsx (sidebar + main content)
     app/dashboard/page.tsx
     app/dashboard/study/page.tsx
@@ -81,6 +83,35 @@ Authentication page for email/password login. Redirects to `/dashboard` on succe
 - Protected routes (`/dashboard/*`) redirect here when the user is not authenticated
 - On successful login, redirects to `/dashboard`
 - When `SKIP_AUTH=true` or `DATABASE_URL` is unset, this page is bypassed
+
+---
+
+## Signup (/signup)
+
+**File:** `apps/web/src/app/signup/page.tsx`
+**Component:** `SignupPage` (Client Component)
+
+### Purpose
+Account creation page. Registers a local account, then signs the new user in and
+sends them to `/dashboard`.
+
+### Key Components
+
+| Component | Purpose |
+|-----------|---------|
+| Signup form | Name, email, password and confirm-password fields |
+| Error display | Shows validation and registration errors |
+| Brand header | App name and description |
+
+### Behavior
+- Submits to `POST /api/auth/signup`, then calls `signIn("credentials", ...)`
+- On success, redirects to `/dashboard`; if the automatic sign-in fails, falls
+  back to `/login`
+- Requires a configured `DATABASE_URL` - registration returns `503` without one
+- The endpoint is rate limited to 5 attempts per minute per caller address
+
+### Data Requirements
+- `POST /api/auth/signup` (account creation)
 
 ---
 

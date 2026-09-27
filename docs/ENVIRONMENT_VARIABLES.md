@@ -60,7 +60,11 @@ API key for Claude (Anthropic) powering the AI Tutor feature. This variable is i
 | Default | None |
 | Format | `sk-ant-api03-...` |
 
-When unset, the AI Tutor page loads but returns a 401 error when sending messages. All other features work without this key.
+When unset, the AI Tutor page loads and sending a message returns a chat message
+explaining how to configure the key. All other features work without it.
+
+(A `401` from `/api/chat` means something different: not signed in. See
+`ALLOW_AUTH_BYPASS` below.)
 
 **Get a key:** [console.anthropic.com](https://console.anthropic.com/)
 
@@ -68,7 +72,7 @@ When unset, the AI Tutor page loads but returns a 401 error when sending message
 
 ### `SKIP_AUTH`
 
-Bypasses authentication middleware. Used for E2E testing and development without a database.
+Bypasses authentication proxy. Used for E2E testing and development without a database.
 
 | Property | Value |
 |----------|-------|
@@ -77,9 +81,19 @@ Bypasses authentication middleware. Used for E2E testing and development without
 | Values | `"true"` to skip auth |
 
 When set to `"true"`:
-- The middleware does not redirect unauthenticated users to `/login`
+- The proxy does not redirect unauthenticated users to `/login`
 - `getCurrentUserId()` returns `null` (progress is not saved to DB)
 - The app behaves as if no user is logged in
+- The session gates on `/api/chat`, `/api/labs/{slug}/run` and
+  `/api/labs/{slug}/solution` allow anonymous callers through
+
+> **Exposure note.** With auth bypassed there is no per-user identity, so the
+> rate limits for those routes all key on one shared local caller. That keeps the
+> limits meaningful for a single-user lab, but an instance reachable from a
+> network hands every caller the same quota - roughly 14,400 tutor requests a day
+> against your Anthropic key, plus lab code execution. Only bypass auth on a
+> machine you control. In production the bypass must be asserted explicitly with
+> `ALLOW_AUTH_BYPASS` (below).
 
 Set automatically by Playwright in `playwright.config.ts`:
 
@@ -93,17 +107,63 @@ webServer: {
 
 ---
 
+### `ALLOW_AUTH_BYPASS`
+
+Confirms that an open, unauthenticated deployment is intentional. Only consulted
+when `NODE_ENV=production`.
+
+| Property | Value |
+|----------|-------|
+| Required | Only in production, and only when auth would be bypassed |
+| Default | Not set |
+| Values | `"true"` to confirm an intentionally open production deployment |
+
+Authentication is bypassed when `SKIP_AUTH=true` or `DATABASE_URL` is unset. In
+development that is the normal single-user local mode. In production, inferring
+"authentication off" from a *missing* variable fails open - an unmounted secret,
+a typo, or a platform that supplies a differently-named database URL would all
+quietly serve the app with no authentication.
+
+So in production the bypass has to be asserted. If auth would be bypassed and
+this variable is not `"true"`, the gated routes fail closed (a generic error, no
+data served) and the server log carries the actionable message:
+
+```
+Authentication would be bypassed in production. Set DATABASE_URL to enable
+authentication, or set ALLOW_AUTH_BYPASS=true to confirm an intentionally open
+deployment.
+```
+
+Fixing it means one of:
+- set `DATABASE_URL` so authentication actually works (what you usually want), or
+- set `ALLOW_AUTH_BYPASS=true` if the deployment is deliberately open - read the
+  exposure note under `SKIP_AUTH` first.
+
+Development and Playwright runs are unaffected: both run with
+`NODE_ENV=development`.
+
+---
+
 ### `LAB_ENGINE_URL`
 
 URL of the Docker-based lab engine service. Used to proxy code execution requests to the FastAPI lab engine instead of running Python locally.
 
 | Property | Value |
 |----------|-------|
-| Required | No |
+| Required | No (recommended - see below) |
 | Default | None |
-| Format | `http://HOST:PORT` (e.g., `http://localhost:8100`) |
+| Format | Full endpoint URL, **not** just the host: `http://localhost:8100/api/v1/sandbox/run` |
 
-When unset, labs that support local execution (Python, API, NETCONF) will run code via a local `python3` subprocess. Labs requiring Docker (Bash, Docker, Ansible) will display a message that the lab engine is required.
+This must be the complete endpoint URL. The route POSTs to this value directly,
+so a bare `http://localhost:8100` returns **404** and every lab silently falls
+back to local execution.
+
+```bash
+# Correct - matches the lab-engine's sandbox route
+LAB_ENGINE_URL=http://localhost:8100/api/v1/sandbox/run
+```
+
+When unset, labs that support local execution (Python, API, NETCONF) will run code via a local `python3` subprocess. Labs requiring Docker (Bash, Docker, Ansible) will display a message that the lab engine is required - so set this once the Docker stack is running, or those labs stay unavailable.
 
 ---
 
@@ -143,9 +203,10 @@ AUTH_SECRET=your-generated-base64-secret-here
 
 | Variable | Required | Default | Used By |
 |----------|----------|---------|---------|
-| `DATABASE_URL` | For DB features | None | `lib/db/index.ts`, `middleware.ts`, `lib/auth-helpers.ts` |
+| `DATABASE_URL` | For DB features | None | `lib/db/index.ts`, `proxy.ts`, `lib/auth-helpers.ts` |
 | `AUTH_SECRET` | Yes | None | `lib/auth.ts` (Auth.js) |
 | `TUTOR_ANTHROPIC_KEY` | For AI Tutor | None | `api/chat/route.ts` |
-| `SKIP_AUTH` | For testing | Not set | `middleware.ts`, `lib/auth-helpers.ts` |
+| `SKIP_AUTH` | For testing | Not set | `proxy.ts`, `lib/auth-helpers.ts` |
+| `ALLOW_AUTH_BYPASS` | In production, if auth would be bypassed | Not set | `lib/auth-helpers.ts` |
 | `LAB_ENGINE_URL` | No | None | `api/labs/[slug]/run/route.ts` |
 | `POSTGRES_PASSWORD` | For Docker | `studylab_dev_2024` | `docker/docker-compose.yml` |

@@ -1,4 +1,11 @@
-version: "3.9"
+# DevNet StudyLab local stack.
+#
+# No top-level `version:` key - it is obsolete in Compose V2+ and only produces
+# a warning on every command.
+#
+# Health checks are defined once in services/lab-engine/Dockerfile (they use the
+# Python interpreter, not curl, which python:*-slim does not ship). The mock
+# services reuse that probe by overriding PORT.
 
 services:
   # ── PostgreSQL Database ──────────────────────────────────
@@ -40,6 +47,8 @@ services:
       - gitea-config:/etc/gitea
 
   # ── Lab Engine (FastAPI) ─────────────────────────────────
+  # Serves exercise grading, the Python sandbox, and all three mock platform
+  # APIs mounted under /mock/<platform>.
   lab-engine:
     build:
       context: ../services/lab-engine
@@ -49,6 +58,7 @@ services:
     environment:
       DATABASE_URL: postgresql://studylab:${POSTGRES_PASSWORD:-studylab_dev_2024}@postgres:5432/studylab
       PYTHONDONTWRITEBYTECODE: "1"
+      PORT: "8100"
     ports:
       - "8100:8100"
     volumes:
@@ -57,11 +67,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8100/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 3
 
   # ── Mock Meraki Dashboard API ────────────────────────────
   mock-meraki:
@@ -69,7 +74,12 @@ services:
       context: ../services/lab-engine
       dockerfile: Dockerfile
     container_name: studylab-meraki
-    command: uvicorn mock_apis.meraki.app:app --host 0.0.0.0 --port 8201
+    restart: unless-stopped
+    # PORT is the single source of truth: the server binds it and the
+    # Dockerfile's health probe targets it, so the two cannot drift.
+    command: sh -c 'uvicorn mock_apis.meraki.app:app --host 0.0.0.0 --port "$$PORT"'
+    environment:
+      PORT: "8201"
     ports:
       - "8201:8201"
     volumes:
@@ -81,7 +91,12 @@ services:
       context: ../services/lab-engine
       dockerfile: Dockerfile
     container_name: studylab-catalyst
-    command: uvicorn mock_apis.catalyst.app:app --host 0.0.0.0 --port 8202
+    restart: unless-stopped
+    # PORT is the single source of truth: the server binds it and the
+    # Dockerfile's health probe targets it, so the two cannot drift.
+    command: sh -c 'uvicorn mock_apis.catalyst.app:app --host 0.0.0.0 --port "$$PORT"'
+    environment:
+      PORT: "8202"
     ports:
       - "8202:8202"
     volumes:
@@ -93,7 +108,12 @@ services:
       context: ../services/lab-engine
       dockerfile: Dockerfile
     container_name: studylab-webex
-    command: uvicorn mock_apis.webex.app:app --host 0.0.0.0 --port 8203
+    restart: unless-stopped
+    # PORT is the single source of truth: the server binds it and the
+    # Dockerfile's health probe targets it, so the two cannot drift.
+    command: sh -c 'uvicorn mock_apis.webex.app:app --host 0.0.0.0 --port "$$PORT"'
+    environment:
+      PORT: "8203"
     ports:
       - "8203:8203"
     volumes:

@@ -152,6 +152,7 @@ export default function LabExecutionPage() {
   const [isRunning, setIsRunning] = useState(false);
   const [showSolution, setShowSolution] = useState(false);
   const [solutionData, setSolutionData] = useState<LabSolution | null>(null);
+  const [solutionError, setSolutionError] = useState<string | null>(null);
   const [hintsRevealed, setHintsRevealed] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -206,6 +207,19 @@ export default function LabExecutionPage() {
         body: JSON.stringify({ code }),
       });
 
+      if (!res.ok) {
+        // The route requires a session and is rate limited, so a signed-out or
+        // too-eager caller gets an { error } body with no output field. Show the
+        // message instead of leaving the terminal blank.
+        const body = await res.json().catch(() => null);
+        setOutput(
+          body?.error ?? `Could not run this lab (HTTP ${res.status}).`,
+        );
+        setRunSuccess(false);
+        setExecutionTime(null);
+        return;
+      }
+
       const result: RunResult = await res.json();
       setOutput(result.output);
       setRunSuccess(result.success);
@@ -238,12 +252,23 @@ export default function LabExecutionPage() {
     if (!solutionData) {
       try {
         const res = await fetch(`/api/labs/${slug}/solution`);
+
         if (res.ok) {
           const data: LabSolution = await res.json();
           setSolutionData(data);
+          setSolutionError(null);
+        } else {
+          // The endpoint requires a session, so a signed-out or expired user
+          // lands here. Show the server's own message rather than an empty panel.
+          const body = await res.json().catch(() => null);
+          setSolutionError(
+            body?.error ?? "Could not load the solution. Please try again.",
+          );
         }
       } catch {
-        // Silently handle
+        setSolutionError(
+          "Could not reach the server to load the solution. Please try again.",
+        );
       }
     }
 
@@ -637,7 +662,7 @@ export default function LabExecutionPage() {
           </div>
 
           {/* Solution panel (shown below terminal when active) */}
-          {showSolution && solutionData && (
+          {showSolution && (solutionData || solutionError) && (
             <div className="shrink-0 max-h-48 border-t border-amber-500/30 bg-amber-500/5">
               <div className="px-4 py-2 border-b border-amber-500/20">
                 <span className="text-xs font-medium text-amber-400">
@@ -645,9 +670,13 @@ export default function LabExecutionPage() {
                 </span>
               </div>
               <ScrollArea className="h-40">
-                <pre className="p-4 text-xs font-mono text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                  {solutionData.solutionCode}
-                </pre>
+                {solutionError ? (
+                  <p className="p-4 text-xs text-amber-300">{solutionError}</p>
+                ) : (
+                  <pre className="p-4 text-xs font-mono text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                    {solutionData?.solutionCode}
+                  </pre>
+                )}
               </ScrollArea>
             </div>
           )}

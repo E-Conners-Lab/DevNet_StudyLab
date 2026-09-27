@@ -1,5 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
+// Mock auth-helpers so the route's session lookup never loads next-auth, which
+// cannot resolve `next/server` under the jsdom test environment.
+vi.mock("@/lib/auth-helpers", () => ({
+  getCurrentUserId: vi.fn().mockResolvedValue(null),
+  isAuthBypassed: () => true,
+}));
+
 // Mock the Anthropic SDK before importing the route
 vi.mock("@anthropic-ai/sdk", () => {
   class MockAnthropic {
@@ -28,8 +35,15 @@ async function importRoute(events: StreamEvent[] = DEFAULT_EVENTS) {
   };
   const streamMock = vi.fn().mockResolvedValue(mockStream);
 
-  // Re-mock after reset. A real class is required: the route calls
-  // `new Anthropic(...)` and checks `instanceof Anthropic.APIError`.
+  // Re-mock after reset. These tests run in the auth-bypassed mode (no
+  // DATABASE_URL), which is how the local single-user lab runs.
+  vi.doMock("@/lib/auth-helpers", () => ({
+    getCurrentUserId: vi.fn().mockResolvedValue(null),
+    isAuthBypassed: () => true,
+  }));
+
+  // A real class is required: the route calls `new Anthropic(...)` and checks
+  // `instanceof Anthropic.APIError`.
   vi.doMock("@anthropic-ai/sdk", () => {
     class MockAnthropic {
       static APIError = class extends Error {};
@@ -184,5 +198,154 @@ describe("POST /api/chat", () => {
 
     expect(response.status).toBe(200);
     expect(text).toContain("can't help with that request");
+  });
+});
+
+describe("POST /api/chat - access control", () => {
+  const originalEnv = process.env;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    process.env = { ...originalEnv };
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+  });
+
+  /**
+   * Import the route with auth active (auth is not bypassed) and a stubbed
+   * session user.
+   *
+   * Returns `streamMock` so a test can assert the Anthropic API was or was not
+   * reached, and `setUser` so a test can change the signed-in user *without*
+   * resetting modules - the rate limiter is module state, so resetting would
+   * discard it and any cross-user assertion would pass vacuously.
+   */
+  async function importRouteWithUser(userId: string | null) {
+    vi.resetModules();
+
+    const streamMock = vi.fn().mockImplementation(async () => ({
+      [Symbol.asyncIterator]: async function* () {
+        yield* DEFAULT_EVENTS;
+      },
+    }));
+
+    vi.doMock("@anthropic-ai/sdk", () => {
+      class MockAnthropic {
+        static APIError = class extends Error {};
+        messages = { stream: streamMock };
+      }
+      return { default: MockAnthropic };
+    });
+
+    const getCurrentUserId = vi.fn().mockResolvedValue(userId);
+
+    vi.doMock("@/lib/auth-helpers", () => ({
+      getCurrentUserId,
+      isAuthBypassed: () => false,
+    }));
+
+    const mod = await import("@/app/api/chat/route");
+    const { resetRateLimits } = await import("@/lib/rate-limit");
+    resetRateLimits();
+
+    return {
+      ...mod,
+      streamMock,
+      setUser: (next: string | null) =>
+        getCurrentUserId.mockResolvedValue(next),
+    };
+  }
+
+  it("returns 401 when no user is signed in and auth is active", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST } = await importRouteWithUser(null);
+    const response = await POST(
+      createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+    );
+    const data = await response.json();
+
+    expect(response.status).toBe(401);
+    expect(data.error).toContain("Sign in");
+  });
+
+  it("does not reach the Anthropic API when unauthenticated", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST, streamMock } = await importRouteWithUser(null);
+    await POST(
+      createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+    );
+
+    expect(streamMock).not.toHaveBeenCalled();
+
+    // The gate also runs before the rate limiter, so a rejected caller does not
+    // consume anyone's quota.
+    const { trackedKeys } = await import("@/lib/rate-limit");
+    expect(trackedKeys()).toEqual([]);
+  });
+
+  it("allows a signed-in user through", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST } = await importRouteWithUser("user-1");
+    const response = await POST(
+      createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("Hello");
+  });
+
+  it("returns 429 with Retry-After once the per-user limit is exceeded", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST } = await importRouteWithUser("user-1");
+    const { RATE_LIMITS } = await import("@/lib/rate-limit");
+
+    for (let i = 0; i < RATE_LIMITS.tutor.limit; i++) {
+      const ok = await POST(
+        createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+      );
+      expect(ok.status).toBe(200);
+    }
+
+    const blocked = await POST(
+      createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+    );
+    const data = await blocked.json();
+
+    expect(blocked.status).toBe(429);
+    expect(Number(blocked.headers.get("Retry-After"))).toBeGreaterThanOrEqual(1);
+    expect(data.error).toContain("limit");
+  });
+
+  it("limits each user separately", async () => {
+    process.env.TUTOR_ANTHROPIC_KEY = "test-key-123";
+
+    const { POST, setUser } = await importRouteWithUser("user-1");
+    const { RATE_LIMITS } = await import("@/lib/rate-limit");
+
+    // Exhaust user-1 through the route itself, so the limiter state under test
+    // is the one the route actually uses.
+    for (let i = 0; i < RATE_LIMITS.tutor.limit; i++) {
+      await POST(
+        createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+      );
+    }
+    const blocked = await POST(
+      createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+    );
+    expect(blocked.status).toBe(429);
+
+    // Same module instance, same limiter state - only the user changes.
+    setUser("user-2");
+    const response = await POST(
+      createRequest({ messages: [{ role: "user", content: "Hi" }] }) as never,
+    );
+
+    expect(response.status).toBe(200);
   });
 });

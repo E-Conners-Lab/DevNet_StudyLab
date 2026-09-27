@@ -25,7 +25,12 @@ Base URL: `http://localhost:3000`
 
 AI Tutor chat endpoint. Streams Claude responses back to the client using chunked transfer encoding.
 
-**Authentication:** None (server-side API key from environment)
+**Authentication:** Session required. Every call spends Anthropic API tokens, so
+the endpoint rejects anonymous callers with `401` and rate limits each user to
+**10 requests per minute** (sliding window). Authentication is bypassed only when
+there is no account to check against - `SKIP_AUTH=true` (E2E runs) or an unset
+`DATABASE_URL` (local single-user use) - in which case the rate limit applies to
+the shared local caller.
 
 **Request Body:**
 
@@ -63,6 +68,8 @@ Transfer-Encoding: chunked
 | 400 | `{"error": "Messages array is required and must not be empty."}` | Missing or empty messages array |
 | 400 | `{"error": "Each message must have a role and content."}` | Malformed message object |
 | 400 | `{"error": "Message role must be 'user' or 'assistant'."}` | Invalid role value |
+| 401 | `{"error": "Sign in to use the AI tutor."}` | No session, and auth is active |
+| 429 | `{"error": "You have reached the tutor request limit. Try again in Ns."}` | More than 10 requests in the last minute. Carries a `Retry-After` header (seconds). |
 | 200 | Streaming text explaining the key is not configured | Missing or invalid API key (rendered as a chat message) |
 | 200 | Streaming text asking user to wait | Anthropic rate limit exceeded (rendered as a chat message) |
 | 200 | Streaming text with error details | Anthropic API or server error (rendered as a chat message) |
@@ -348,7 +355,15 @@ Get a specific lab by slug (solution code stripped).
 
 Execute submitted code for a lab and grade the result.
 
-**Authentication:** Optional (persists attempt to DB when authenticated)
+**Authentication:** Session required. This route runs caller-supplied code - in
+the lab-engine container when `LAB_ENGINE_URL` is set, otherwise in a `python3`
+subprocess on the web host - which makes it the most privileged endpoint in the
+app. Anonymous callers get `401`, and each user is limited to **10 runs per 10
+seconds**. An authenticated run also persists the attempt to the database.
+
+Authentication is bypassed only when there is no account to check against
+(`SKIP_AUTH=true`, or an unset `DATABASE_URL`); in production that bypass must be
+confirmed with `ALLOW_AUTH_BYPASS=true`.
 
 **Path Parameters:**
 
@@ -360,22 +375,41 @@ Execute submitted code for a lab and grade the result.
 
 ```json
 {
-  "code": "import json\n...",
-  "language": "python"
+  "code": "import json\n..."
 }
 ```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `code` | `string` | Yes | The code to execute. The language is taken from the lab, not the request. |
 
 **Response:** `200 OK`
 
 ```json
 {
-  "passed": true,
-  "output": "...",
-  "errors": "",
-  "score": 1.0,
-  "feedback": "All tests passed!"
+  "success": true,
+  "output": "42",
+  "executionTime": 19,
+  "engineAvailable": false
 }
 ```
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `success` | `boolean` | Whether the code ran without error |
+| `output` | `string` | Combined stdout/stderr from the run |
+| `executionTime` | `number` | Wall-clock duration in milliseconds |
+| `engineAvailable` | `boolean` | `true` when the run went to the lab engine, `false` when it fell back to a local `python3` subprocess |
+
+**Error Responses:**
+
+| Status | Body | Condition |
+|--------|------|-----------|
+| 400 | `{"error": "Invalid JSON in request body"}` | Body is not valid JSON |
+| 400 | `{"error": "\"code\" string is required"}` | Missing or non-string `code` |
+| 401 | `{"error": "Sign in to run labs."}` | No session, and auth is active |
+| 404 | `{"error": "Lab \"<slug>\" not found"}` | Unknown lab slug |
+| 429 | `{"error": "Too many lab runs. Try again in Ns."}` | More than 10 runs in 10 seconds. Carries a `Retry-After` header. |
 
 ---
 
@@ -383,7 +417,9 @@ Execute submitted code for a lab and grade the result.
 
 Get the solution code and expected output for a lab.
 
-**Authentication:** None
+**Authentication:** Session required - this is answer-key material, so anonymous
+callers get `401`. Bypassed when there is no account to check against
+(`SKIP_AUTH=true`, or an unset `DATABASE_URL`).
 
 **Path Parameters:**
 
@@ -404,6 +440,7 @@ Get the solution code and expected output for a lab.
 
 | Status | Body | Condition |
 |--------|------|-----------|
+| 401 | `{"error": "Sign in to view the lab solution."}` | No session, and auth is active |
 | 404 | `{"error": "Lab \"...\" not found"}` | Invalid lab slug |
 
 ---
@@ -515,6 +552,50 @@ Auth.js authentication handler. Supports credentials-based login.
 **Authentication:** None
 
 See [Auth.js documentation](https://authjs.dev/) for the full NextAuth REST API.
+
+---
+
+### POST /api/auth/signup
+
+Create a local account. Requires a configured database - there is nowhere to
+store a user otherwise.
+
+**Authentication:** None. Rate limited to **5 requests per minute** per caller
+address, since this is an unauthenticated endpoint that writes a user row.
+
+**Request Body:**
+
+```json
+{
+  "name": "Student",
+  "email": "student@devnet.lab",
+  "password": "at-least-8-chars"
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `string` | Yes | Display name. Trimmed; must not be blank. |
+| `email` | `string` | Yes | Must match a basic `local@domain.tld` shape. Stored lowercased. |
+| `password` | `string` | Yes | Minimum 8 characters. Hashed with bcrypt (cost 12) before storage. |
+
+**Response:** `201 Created`
+
+```json
+{ "success": true }
+```
+
+**Error Responses:**
+
+| Status | Body | Condition |
+|--------|------|-----------|
+| 400 | `{"error": "Name is required"}` | Missing or blank name |
+| 400 | `{"error": "Valid email is required"}` | Missing or non-string email |
+| 400 | `{"error": "Invalid email format"}` | Email fails the format check |
+| 400 | `{"error": "Password must be at least 8 characters"}` | Password too short |
+| 409 | `{"error": "Email already in use"}` | An account with that email exists |
+| 429 | `{"error": "Too many signup attempts. Try again in Ns."}` | More than 5 attempts in the last minute. Carries a `Retry-After` header. |
+| 503 | `{"error": "Database is not configured"}` | `DATABASE_URL` is unset |
 
 ---
 

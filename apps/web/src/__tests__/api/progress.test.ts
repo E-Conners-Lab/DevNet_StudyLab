@@ -78,6 +78,70 @@ const {
 // Tests
 // ---------------------------------------------------------------------------
 
+// Mocks for the route integration tests below. These are hoisted to the top of the module regardless of where they appear, so they live at top level to reflect their actual execution order.
+vi.mock("@/lib/auth-helpers", () => ({
+  getCurrentUserId: vi.fn().mockResolvedValue("test-user"),
+  // Mock the whole module surface, not just what today's routes call - a
+  // partial mock is how the next auth gate added to these routes would fail
+  // with a confusing "not a function" instead of a clear assertion.
+  isAuthBypassed: () => false,
+}));
+
+vi.mock("@/lib/data", async () => {
+  const mockGradeResult = {
+    score: 75,
+    totalQuestions: 4,
+    totalCorrect: 3,
+    passed: true,
+    timeTaken: 600,
+    questionResults: [
+      {
+        questionId: "q1",
+        text: "Question 1",
+        correct: true,
+        userAnswer: "B",
+        correctAnswer: "B",
+        explanation: "Correct!",
+      },
+      {
+        questionId: "q2",
+        text: "Question 2",
+        correct: true,
+        userAnswer: "C",
+        correctAnswer: "C",
+        explanation: "Right!",
+      },
+      {
+        questionId: "q3",
+        text: "Question 3",
+        correct: true,
+        userAnswer: ["A", "C"],
+        correctAnswer: ["A", "C"],
+        explanation: "Both correct!",
+      },
+      {
+        questionId: "q4",
+        text: "Question 4",
+        correct: false,
+        userAnswer: "wrong",
+        correctAnswer: "diff",
+        explanation: "It was diff.",
+      },
+    ],
+    domainBreakdown: [
+      { domain: "Software Development & Design", correct: 2, total: 2, percentage: 100 },
+      { domain: "Understanding & Using APIs", correct: 1, total: 1, percentage: 100 },
+      { domain: "Cisco Platforms & Development", correct: 0, total: 1, percentage: 0 },
+    ],
+  };
+
+  return {
+    gradeExam: vi.fn().mockReturnValue(mockGradeResult),
+    saveExamAttempt: vi.fn().mockResolvedValue("attempt-123"),
+    getExamAttempts: vi.fn().mockResolvedValue([]),
+  };
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
   dbConfigured = true;
@@ -244,65 +308,6 @@ describe("progress functions — DB available with valid user", () => {
 // ---------------------------------------------------------------------------
 
 describe("POST /api/exams/[examId]/grade — route integration", () => {
-  // Mock dependencies for the route
-  vi.mock("@/lib/auth-helpers", () => ({
-    getCurrentUserId: vi.fn().mockResolvedValue("test-user"),
-  }));
-
-  vi.mock("@/lib/data", async () => {
-    const mockGradeResult = {
-      score: 75,
-      totalQuestions: 4,
-      totalCorrect: 3,
-      passed: true,
-      timeTaken: 600,
-      questionResults: [
-        {
-          questionId: "q1",
-          text: "Question 1",
-          correct: true,
-          userAnswer: "B",
-          correctAnswer: "B",
-          explanation: "Correct!",
-        },
-        {
-          questionId: "q2",
-          text: "Question 2",
-          correct: true,
-          userAnswer: "C",
-          correctAnswer: "C",
-          explanation: "Right!",
-        },
-        {
-          questionId: "q3",
-          text: "Question 3",
-          correct: true,
-          userAnswer: ["A", "C"],
-          correctAnswer: ["A", "C"],
-          explanation: "Both correct!",
-        },
-        {
-          questionId: "q4",
-          text: "Question 4",
-          correct: false,
-          userAnswer: "wrong",
-          correctAnswer: "diff",
-          explanation: "It was diff.",
-        },
-      ],
-      domainBreakdown: [
-        { domain: "Software Development & Design", correct: 2, total: 2, percentage: 100 },
-        { domain: "Understanding & Using APIs", correct: 1, total: 1, percentage: 100 },
-        { domain: "Cisco Platforms & Development", correct: 0, total: 1, percentage: 0 },
-      ],
-    };
-
-    return {
-      gradeExam: vi.fn().mockReturnValue(mockGradeResult),
-      saveExamAttempt: vi.fn().mockResolvedValue("attempt-123"),
-      getExamAttempts: vi.fn().mockResolvedValue([]),
-    };
-  });
 
   it("returns correct response shape with all required fields", async () => {
     const { POST } = await import("@/app/api/exams/[examId]/grade/route");

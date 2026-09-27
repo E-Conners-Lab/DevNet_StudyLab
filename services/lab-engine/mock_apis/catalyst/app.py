@@ -12,6 +12,8 @@ from typing import Optional
 
 from fastapi import APIRouter, Header, HTTPException, Request
 
+from mock_apis.standalone import make_standalone_app
+
 router = APIRouter()
 
 # ---------------------------------------------------------------------------
@@ -405,3 +407,19 @@ async def list_hosts(
 ):
     _require_token(x_auth_token)
     return HOSTS
+
+
+# ---------------------------------------------------------------------------
+# Standalone service entrypoint
+# ---------------------------------------------------------------------------
+# This must stay the LAST thing in the file: it snapshots the router, so a
+# route declared below it would be served under /mock/* (main.py includes the
+# router later) but be missing from the standalone service. tests/ asserts the
+# two expose identical paths.
+# `main.py` mounts `router` under /mock/catalyst; this `app` is what the
+# `mock-catalyst` container serves on its own port.
+app = make_standalone_app(
+    router,
+    title="Mock Cisco Catalyst Center API",
+    description="Catalyst Center (DNA Center) Intent API simulator for DevNet study",
+)

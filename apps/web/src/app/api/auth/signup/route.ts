@@ -3,10 +3,30 @@ import { eq } from "drizzle-orm";
 
 import { isDbConfigured, getDb } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
-import { jsonOk, jsonBadRequest, jsonError } from "@/lib/api-helpers";
+import {
+  jsonOk,
+  jsonBadRequest,
+  jsonError,
+  jsonTooManyRequests,
+} from "@/lib/api-helpers";
+import { checkRateLimit, clientIpKey, RATE_LIMITS } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
+    // Unauthenticated endpoint that writes a user row, so throttle it per
+    // caller address before doing any work.
+    const { allowed, retryAfterSeconds } = checkRateLimit(
+      `signup:${clientIpKey(request)}`,
+      RATE_LIMITS.signup,
+    );
+
+    if (!allowed) {
+      return jsonTooManyRequests(
+        retryAfterSeconds,
+        `Too many signup attempts. Try again in ${retryAfterSeconds}s.`,
+      );
+    }
+
     const { name, email, password } = await request.json();
 
     // Validate required fields

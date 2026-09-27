@@ -1,5 +1,6 @@
 /**
- * Route protection middleware
+ * Route protection proxy (formerly `middleware.ts` - Next 16 renamed the
+ * convention to `proxy`; the exported function is renamed to match).
  *
  * Protects /dashboard/* routes, redirecting unauthenticated users to /login.
  *
@@ -11,7 +12,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   // Skip auth when testing or when the database is unavailable
   if (
     process.env.SKIP_AUTH === "true" ||

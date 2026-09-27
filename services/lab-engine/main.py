@@ -12,6 +12,7 @@ from mock_apis.meraki.app import router as meraki_router
 from mock_apis.catalyst.app import router as catalyst_router
 from mock_apis.webex.app import router as webex_router
 from grader.python_grader import grade_submission
+from mock_apis.standalone import ALLOWED_ORIGINS
 
 # ---------------------------------------------------------------------------
 # Application
@@ -25,7 +26,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=list(ALLOWED_ORIGINS),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

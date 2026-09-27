@@ -100,8 +100,25 @@ cd apps/web && npm run test:e2e
 # Content validation
 cd apps/web && npm run test:content
 
-# All tests
+# Coverage
+cd apps/web && npm run test:coverage
+
+# All unit + content tests
 cd apps/web && npm run test:all
+```
+
+Lab engine (Python) tests, and the checks CI runs on the Python side:
+
+```bash
+# Lab engine tests - no local Python setup needed
+docker run --rm -v "$PWD/services/lab-engine:/app" -w /app python:3.12-slim \
+  sh -c 'pip install -q -r requirements-dev.txt && python -m pytest tests/ -v'
+
+# Assert requirements.txt and requirements.lock.txt agree
+python3 scripts/check-lock-drift.py
+
+# Documentation coverage (routes, pages, tables, Python endpoints)
+cd apps/web && npm run docs:validate
 ```
 
 ## Exam Domains (200-901 v1.1)

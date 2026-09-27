@@ -80,10 +80,13 @@ export function useChat(options: UseChatOptions = {}): UseChatReturn {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
+          // The route always sends an { error } message on a failure status
+          // (401 sign-in required, 429 rate limited, 400 validation), so prefer
+          // it; the fallbacks only cover a response that carries no body.
           const errorMessage =
             errorData?.error ||
             (response.status === 401
-              ? "API key not configured. Please set TUTOR_ANTHROPIC_KEY."
+              ? "Please sign in to use the AI tutor."
               : response.status === 429
                 ? "Rate limit reached. Please wait a moment and try again."
                 : `Request failed (${response.status})`);

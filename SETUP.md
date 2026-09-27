@@ -149,6 +149,28 @@ This starts:
 | Mock Webex | 8203 | Webex Teams API simulator |
 | Gitea | 3001 | Git server for Git labs |
 
+Each mock platform runs as its own service on the port above, and is *also*
+mounted inside the lab engine under `/mock/<platform>` (e.g.
+`http://localhost:8100/mock/meraki/api/v1/organizations`). Either address works.
+
+Verify the stack is up - all services except Gitea report a health status:
+
+```bash
+docker compose -f docker/docker-compose.yml ps
+```
+
+To let labs execute code in the container sandbox rather than a local `python3`,
+point the app at the lab engine. This must be the **full endpoint URL**, not just
+the host:
+
+```bash
+# apps/web/.env.local
+LAB_ENGINE_URL=http://localhost:8100/api/v1/sandbox/run
+```
+
+Bash, Docker and Ansible labs require this; without it they report that the lab
+engine is needed.
+
 ## Running Without Docker
 
 The app works without Docker or PostgreSQL. When `DATABASE_URL` is unset:
@@ -174,8 +196,30 @@ npm run test:e2e
 # Content validation (checks JSON content files)
 npm run test:content
 
+# Coverage report
+npm run test:coverage
+
 # All unit + content tests
 npm run test:all
+```
+
+The lab engine has its own Python suite. It runs in a container, so no local
+Python setup is required:
+
+```bash
+# from the repo root
+docker run --rm -v "$PWD/services/lab-engine:/app" -w /app python:3.12-slim \
+  sh -c 'pip install -q -r requirements-dev.txt && python -m pytest tests/ -v'
+```
+
+Two repo-level checks CI also runs:
+
+```bash
+# requirements.txt pins must match requirements.lock.txt (the image installs the lock)
+python3 scripts/check-lock-drift.py
+
+# every route, page, table and Python endpoint must be documented
+cd apps/web && npm run docs:validate
 ```
 
 ## Drizzle Studio

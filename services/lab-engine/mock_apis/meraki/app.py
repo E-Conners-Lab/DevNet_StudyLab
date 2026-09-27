@@ -9,6 +9,8 @@ from fastapi import APIRouter, Header, HTTPException, Body
 from typing import Optional
 from datetime import datetime, timezone
 
+from mock_apis.standalone import make_standalone_app
+
 router = APIRouter()
 
 # ---------------------------------------------------------------------------
@@ -455,3 +457,19 @@ async def update_device(
         device["notes"] = body.get("notes", "")
 
     return device
+
+
+# ---------------------------------------------------------------------------
+# Standalone service entrypoint
+# ---------------------------------------------------------------------------
+# This must stay the LAST thing in the file: it snapshots the router, so a
+# route declared below it would be served under /mock/* (main.py includes the
+# router later) but be missing from the standalone service. tests/ asserts the
+# two expose identical paths.
+# `main.py` mounts `router` under /mock/meraki; this `app` is what the
+# `mock-meraki` container serves on its own port.
+app = make_standalone_app(
+    router,
+    title="Mock Meraki Dashboard API",
+    description="Meraki Dashboard API v1 simulator for DevNet certification study",
+)

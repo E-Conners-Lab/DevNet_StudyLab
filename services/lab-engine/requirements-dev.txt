@@ -1,0 +1,11 @@
+# Test-only dependencies for the lab engine.
+#
+# Deliberately NOT installed into the runtime image - a test runner in a
+# production container is attack surface for no benefit. CI installs this on top
+# of requirements.lock.txt.
+#
+# Last resolved: 2026-09-27
+
+-r requirements.txt
+
+pytest==9.1.1

@@ -6,8 +6,8 @@
  * codebase have corresponding documentation in the docs/ directory.
  *
  * Checks:
- *   1. Every API route file (app/api/**/route.ts) is documented in API_REFERENCE.md
- *   2. Every page route (app/**/page.tsx) is documented in ROUTES.md
+ *   1. Every API route file (app/api/<...>/route.ts) is documented in API_REFERENCE.md
+ *   2. Every page route (app/<...>/page.tsx) is documented in ROUTES.md
  *   3. Every database table (from schema.ts) is documented in DATABASE_SCHEMA.md
  *   4. Every Python mock/engine endpoint is documented in API_REFERENCE.md
  *   5. Reports stale doc entries that reference routes/tables no longer in code
@@ -32,6 +32,33 @@ const PROJECT_ROOT = path.resolve(import.meta.dirname, "..");
 const WEB_APP_SRC = path.join(PROJECT_ROOT, "apps", "web", "src");
 const SERVICES_DIR = path.join(PROJECT_ROOT, "services");
 const DOCS_DIR = path.join(PROJECT_ROOT, "docs");
+
+/**
+ * Next.js encodes dynamic segments as `[slug]` / `[...rest]`, while the docs
+ * write them as `{slug}`. Normalize both sides to the brace form before
+ * comparing, otherwise every dynamic route reads as undocumented.
+ */
+function normalizeRoute(route: string): string {
+  return route
+    .replace(/\[\.\.\.([^\]]+)\]/g, "{$1}")
+    .replace(/\[([^\]]+)\]/g, "{$1}");
+}
+
+/**
+ * Reduce a route to its URL *shape* by blanking dynamic segment names, so a
+ * path is matched on structure rather than on what the parameter happens to be
+ * called. The name is not part of the contract: FastAPI declares
+ * `/networks/{network_id}/devices` while the docs, following Cisco's own
+ * reference, write `/networks/{networkId}/devices` - the same endpoint.
+ */
+function routeShape(route: string): string {
+  return normalizeRoute(route).replace(/\{[^}]*\}/g, "{}");
+}
+
+/** Escape regex metacharacters so a route can be embedded in a pattern. */
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&");
+}
 
 const API_REFERENCE_FILE = path.join(DOCS_DIR, "API_REFERENCE.md");
 const ROUTES_FILE = path.join(DOCS_DIR, "ROUTES.md");
@@ -198,9 +225,12 @@ function validateApiRoutes(): ValidationResult[] {
     const methods = extractMethods(file);
     const relativeFile = path.relative(PROJECT_ROOT, file);
 
-    // Check if the route path appears in the doc
-    // Normalize: /api/chat should match "POST /api/chat" or "### POST /api/chat" etc.
-    const routeDocumented = apiRefContent.includes(route);
+    // The docs write dynamic segments either way - `/api/labs/{slug}` or the
+    // literal `/api/auth/[...nextauth]` - so accept both forms.
+    const normalized = normalizeRoute(route);
+    const docRoute = apiRefContent.includes(route) ? route : normalized;
+    const routeDocumented =
+      apiRefContent.includes(route) || apiRefContent.includes(normalized);
 
     if (!routeDocumented) {
       results.push({
@@ -212,12 +242,10 @@ function validateApiRoutes(): ValidationResult[] {
     } else {
       // Check that each exported method is documented
       for (const method of methods) {
-        const methodPattern = new RegExp(
-          `${method}\\s+${route.replace(/\//g, "\\/")}`,
-          "i"
-        );
+        const routePattern = escapeRegex(docRoute);
+        const methodPattern = new RegExp(`${method}\\s+${routePattern}`, "i");
         const headerPattern = new RegExp(
-          `###\\s+${method}\\s+${route.replace(/\//g, "\\/")}`,
+          `###\\s+${method}\\s+${routePattern}`,
           "i"
         );
         if (!methodPattern.test(apiRefContent) && !headerPattern.test(apiRefContent)) {
@@ -477,11 +505,21 @@ function validatePythonEndpoints(): ValidationResult[] {
     let documented = 0;
     let missing = 0;
 
+    // Every path-like token in the doc, reduced to its URL shape, so a
+    // parameter-name difference between the FastAPI decorator and the docs is
+    // not reported as a missing endpoint.
+    const docShapes = new Set(
+      (apiRefContent.match(/(?:\/[A-Za-z0-9_.{}[\]-]+)+/g) ?? []).map(routeShape),
+    );
+
     for (const route of routes) {
       const fullPath = api.prefix + route.path;
       // Check if the endpoint appears in the doc
       const pathInDoc =
-        apiRefContent.includes(route.path) || apiRefContent.includes(fullPath);
+        apiRefContent.includes(route.path) ||
+        apiRefContent.includes(fullPath) ||
+        docShapes.has(routeShape(route.path)) ||
+        docShapes.has(routeShape(fullPath));
 
       if (!pathInDoc) {
         missing++;

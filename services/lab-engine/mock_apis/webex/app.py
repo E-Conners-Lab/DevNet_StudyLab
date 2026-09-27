@@ -12,6 +12,8 @@ from typing import Optional
 from fastapi import APIRouter, Header, HTTPException, Query
 from pydantic import BaseModel
 
+from mock_apis.standalone import make_standalone_app
+
 router = APIRouter()
 
 # ---------------------------------------------------------------------------
@@ -400,3 +402,19 @@ async def add_membership(
     }
     MEMBERSHIPS.setdefault(body.roomId, []).append(new_membership)
     return new_membership
+
+
+# ---------------------------------------------------------------------------
+# Standalone service entrypoint
+# ---------------------------------------------------------------------------
+# This must stay the LAST thing in the file: it snapshots the router, so a
+# route declared below it would be served under /mock/* (main.py includes the
+# router later) but be missing from the standalone service. tests/ asserts the
+# two expose identical paths.
+# `main.py` mounts `router` under /mock/webex; this `app` is what the
+# `mock-webex` container serves on its own port.
+app = make_standalone_app(
+    router,
+    title="Mock Webex API",
+    description="Webex Teams / Messaging REST API simulator for DevNet study",
+)

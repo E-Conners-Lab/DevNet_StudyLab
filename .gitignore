@@ -45,3 +45,6 @@ venv/
 # Misc
 *.log
 npm-debug.log*
+
+# Generated documentation artifacts (rebuild with `npm run docs:generate`)
+docs/manifest.json
