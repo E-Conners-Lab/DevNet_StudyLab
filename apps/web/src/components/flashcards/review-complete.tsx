@@ -39,7 +39,7 @@ export function ReviewComplete({
             Session Complete!
           </h2>
           <p className="text-sm text-zinc-500 mb-8 text-center max-w-md">
-            Great work reinforcing your DevNet knowledge.
+            Great work reinforcing your network automation knowledge.
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 w-full max-w-lg mb-8">

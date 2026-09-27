@@ -1,7 +1,7 @@
 #!/usr/bin/env npx tsx
 
 /**
- * DevNet StudyLab Content Seeding & Validation Script
+ * CCNA Automation Study Prep Content Seeding & Validation Script
  *
  * Reads the exam blueprint, flashcard files, and practice exam files,
  * validates their structure and content, and generates a coverage matrix.
@@ -457,7 +457,7 @@ function validateExamQuestion(
 
 function main() {
   console.log("=".repeat(70));
-  console.log("  DevNet StudyLab Content Seeding & Validation");
+  console.log("  CCNA Automation Study Prep Content Seeding & Validation");
   console.log("  Cisco DevNet Associate (200-901) Exam Blueprint");
   console.log("=".repeat(70));
   console.log();

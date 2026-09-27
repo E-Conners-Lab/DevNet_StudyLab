@@ -1,5 +1,7 @@
 "use client";
 
+import { APP_NAME } from "@/lib/product";
+
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
@@ -67,12 +69,12 @@ export function Sidebar({ pathname }: SidebarProps) {
     <div className="flex h-full flex-col bg-zinc-900 border-r border-zinc-800">
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-500">
           <TerminalSquare className="h-5 w-5" />
         </div>
-        <div>
-          <h1 className="text-base font-bold text-zinc-50 tracking-tight">
-            DevNet StudyLab
+        <div className="min-w-0">
+          <h1 className="text-base leading-snug font-bold text-zinc-50 tracking-tight">
+            {APP_NAME}
           </h1>
           <p className="text-[11px] text-zinc-500 font-medium">Local study edition</p>
         </div>

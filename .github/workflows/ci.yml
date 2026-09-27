@@ -54,7 +54,7 @@ jobs:
       - name: Upload verified snapshot for review
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: devnet-studylab-local
+          name: ccna-automation-study-prep-local
           path: release-artifacts/
           retention-days: 14
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

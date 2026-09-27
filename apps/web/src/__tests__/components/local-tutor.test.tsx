@@ -17,7 +17,7 @@ describe('optional BYOK tutor',()=>{
   expect(await screen.findByText('A REST API uses HTTP methods.')).toBeInTheDocument();
   expect(network.fetch).toHaveBeenCalledWith('/api/v1/tutor',expect.objectContaining({method:'POST'}));
   fireEvent.click(screen.getByRole('button',{name:'New Chat'}));
-  expect(screen.getByText('DevNet AI Tutor')).toBeInTheDocument();
+  expect(screen.getByText('Automation AI Tutor')).toBeInTheDocument();
  });
  it('shows an actionable error when no key is configured',async()=>{
   network.fetch.mockImplementation(async(url:string)=>url.endsWith('/session')?Response.json({csrfToken:'csrf',aiConfigured:false}):Response.json({error:'AI tutor not configured. Set ANTHROPIC_API_KEY in your launcher environment.'},{status:503}));

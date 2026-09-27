@@ -1,3 +1,4 @@
+import product from '../package.json' with { type: 'json' };
 import { mkdir, readFile, readdir, copyFile, writeFile, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -10,7 +11,7 @@ import { preparePythonAssets } from '../runtime/prepare-python.mjs';
 import { createZip } from './zip-release.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
-const name = 'devnet-studylab-1.0.0';
+const name = `${product.name}-${product.version}`;
 const destination = path.join(root, 'release', name);
 async function copy(source, target) {
   await mkdir(path.dirname(target), { recursive: true });
@@ -64,7 +65,7 @@ async function build() {
   }
   await licenses();
   await writeFile(path.join(destination, 'sbom.cdx.json'), npm(['sbom', '--package-lock-only', '--omit=dev', '--sbom-format=cyclonedx', '--prefix', 'apps/web'], true));
-  await writeFile(path.join(destination, 'package.json'), JSON.stringify({ name: 'devnet-studylab-local', version: '1.0.0', private: true, license: 'ISC', scripts: { start: 'node runtime/start.mjs' }, engines: { node: '>=24.21.0 <25' } }, null, 2) + '\n');
+  await writeFile(path.join(destination, 'package.json'), JSON.stringify({ name: product.name, displayName: product.displayName, version: product.version, private: true, license: 'ISC', scripts: { start: 'node runtime/start.mjs' }, engines: { node: '>=24.21.0 <25' } }, null, 2) + '\n');
   await writeFile(path.join(destination, 'release-manifest.json'), JSON.stringify(await makeManifest(destination), null, 2) + '\n');
   await verifyRelease(destination);
   const files = [];

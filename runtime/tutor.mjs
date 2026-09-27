@@ -38,7 +38,7 @@ export function validatePrompt(body) {
 }
 export async function askTutor(prompt, { env, fetchImpl, signal }) {
   const config = tutorConfiguration(env);
-  if (!config.configured) throw new HttpError(503, 'AI tutoring is optional and not configured. Set your local TUTOR_ANTHROPIC_KEY and TUTOR_MODEL, then restart StudyLab.');
+  if (!config.configured) throw new HttpError(503, 'AI tutoring is optional and not configured. Set your local TUTOR_ANTHROPIC_KEY and TUTOR_MODEL, then restart the study app.');
   let response;
   try {
     response = await fetchImpl('https://api.anthropic.com/v1/messages', {

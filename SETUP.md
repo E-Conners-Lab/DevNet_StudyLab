@@ -4,7 +4,7 @@ This guide describes the downloadable local edition. Accounts, PostgreSQL, Docke
 
 ## Run the prebuilt release
 
-Install Node.js **24.21.0 or later within 24.x** and a current browser. Download and extract the prebuilt ZIP from [Releases](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases). Open a terminal in the folder containing `package.json` and run:
+Install Node.js **24.21.0 or later within 24.x** and a current browser. Download and extract the prebuilt ZIP from [Releases](https://github.com/E-Conners-Lab/ccna-automation-study-prep/releases). Open a terminal in the folder containing `package.json` and run:
 
 ```sh
 npm start
@@ -32,7 +32,7 @@ cp .env.example .env
 
 On Windows PowerShell, use `Copy-Item .env.example .env` instead. Edit `.env` locally and set `TUTOR_ANTHROPIC_KEY` and `TUTOR_MODEL`. Use a model ID from [Anthropic's model documentation](https://platform.claude.com/docs/en/models/overview). Both values are required; the app deliberately supplies no permanently promised default model.
 
-Restart StudyLab with `npm start`. Environment variables already set in the launching process take precedence over `.env`. Never commit, upload, or share `.env`; never paste the key into chat or a lab. Remove the key and restart to turn tutoring off.
+Restart CCNA Automation Study Prep with `npm start`. Environment variables already set in the launching process take precedence over `.env`. Never commit, upload, or share `.env`; never paste the key into chat or a lab. Remove the key and restart to turn tutoring off.
 
 The tutor sends submitted chat and recent conversation context to Anthropic. Conversations remain in browser memory and are excluded from progress backups. Core study still works if the key is missing, the provider is unavailable, or a model is retired. Local request limits reduce accidental bursts but are not a monetary spending cap: set account limits with the provider.
 
@@ -80,13 +80,13 @@ Browser verification must target the built release and its local launcher. See [
 
 ## Troubleshooting
 
-To check a download, compare the ZIP's SHA-256 with the accompanying `SHA256SUMS.txt`. On macOS use `shasum -a 256 devnet-studylab-1.0.0.zip`; on Linux use `sha256sum devnet-studylab-1.0.0.zip`; on Windows PowerShell use `Get-FileHash devnet-studylab-1.0.0.zip -Algorithm SHA256`. These checks detect corruption; an unsigned checksum is not proof of publisher identity. The launcher also verifies the extracted files before starting.
+To check a download, compare the ZIP's SHA-256 with the accompanying `SHA256SUMS.txt`. On macOS use `shasum -a 256 ccna-automation-study-prep-1.0.1.zip`; on Linux use `sha256sum ccna-automation-study-prep-1.0.1.zip`; on Windows PowerShell use `Get-FileHash ccna-automation-study-prep-1.0.1.zip -Algorithm SHA256`. These checks detect corruption; an unsigned checksum is not proof of publisher identity. The launcher also verifies the extracted files before starting.
 
 **“Unsupported Node version.”** Run `node --version` in the same terminal. Use Node 24.21.0 or a later patched 24.x release; reopen the terminal after installation.
 
 **Missing build or runtime files.** Extract the complete prebuilt release ZIP. A source ZIP needs the build steps above. Do not use files from two different releases together.
 
-**Port already in use.** Stop the earlier StudyLab process with Ctrl+C or identify the application using ports 4318/4319. Do not terminate unrelated processes or change the configured origins to work around this.
+**Port already in use.** Stop the earlier CCNA Automation Study Prep process with Ctrl+C or identify the application using ports 4318/4319. Do not terminate unrelated processes or change the configured origins to work around this.
 
 **Page denied or runner will not connect.** Use exactly `http://127.0.0.1:4318`. Keep both launcher listeners available. Browser extensions or managed-browser policies may block workers/Wasm; reading, flashcards, and downloadable code remain useful without the runner.
 

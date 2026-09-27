@@ -1,9 +1,10 @@
+import { APP_NAME } from "@/lib/product";
 import type { Metadata } from "next";
 import "./globals.css";
 
 
 export const metadata: Metadata = {
-  title: "DevNet StudyLab",
+  title: APP_NAME,
   description: "Local supplementary study tools based on historical Cisco DevNet 200-901 objectives",
 };
 

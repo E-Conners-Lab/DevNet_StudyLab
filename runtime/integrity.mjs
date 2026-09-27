@@ -1,3 +1,4 @@
+import product from '../package.json' with { type: 'json' };
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
@@ -12,7 +13,7 @@ export async function makeManifest(root) {
     const bytes = await readFile(filename);
     files.push({ path: url.slice(1), bytes: bytes.byteLength, sha256: hash(bytes) });
   }
-  return { schemaVersion: 1, version: '1.0.0', node: '>=24.21.0 <25', files };
+  return { schemaVersion: 1, version: product.version, node: '>=24.21.0 <25', files };
 }
 export async function verifyRelease(root) {
   const manifest = JSON.parse(await readFile(path.join(root, 'release-manifest.json'), 'utf8'));
