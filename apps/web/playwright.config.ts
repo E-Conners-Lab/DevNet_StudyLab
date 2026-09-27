@@ -1,3 +1,4 @@
+import product from "../../package.json";
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
@@ -12,7 +13,7 @@ export default defineConfig({
   use: { baseURL:"http://127.0.0.1:4318", trace:"retain-on-failure", screenshot:"only-on-failure", launchOptions:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE ? {executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE} : {} },
   projects: [{name:"chromium",use:{...devices["Desktop Chrome"]}}],
   webServer: {
-    command:"node ../../release/devnet-studylab-1.0.0/runtime/start.mjs",
+    command:`node ../../release/${product.name}-${product.version}/runtime/start.mjs`,
     url:"http://127.0.0.1:4318",
     reuseExistingServer:false,
     timeout:30_000,

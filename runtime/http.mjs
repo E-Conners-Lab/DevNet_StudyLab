@@ -33,7 +33,7 @@ export function requireBrowserOrigin(req, origin, required = false) {
   const supplied = req.headers.origin;
   if ((required && !supplied) || (supplied && supplied !== origin) ||
       ['cross-site', 'same-site'].includes(req.headers['sec-fetch-site'])) {
-    throw new HttpError(403, 'This request must come from the local StudyLab page.');
+    throw new HttpError(403, 'This request must come from the local study app page.');
   }
 }
 export function readJson(req) {

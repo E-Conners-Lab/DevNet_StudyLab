@@ -18,7 +18,7 @@ export function createSessions(now = Date.now) {
     open(req, res) {
       let session = lookup(req);
       if (!session) {
-        if (sessions.size >= MAX_SESSIONS) throw new HttpError(429, 'Too many local sessions. Restart StudyLab or wait an hour.');
+        if (sessions.size >= MAX_SESSIONS) throw new HttpError(429, 'Too many local sessions. Restart the study app or wait an hour.');
         session = { id: token(), csrf: token(), expires: now()+TTL, calls: [] };
         sessions.set(session.id, session);
       }

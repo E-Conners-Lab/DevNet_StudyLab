@@ -1,14 +1,14 @@
-# DevNet StudyLab — final local edition
+# CCNA Automation Study Prep — final local edition
 
 A downloadable study companion for networking, Python, APIs, and automation. It includes six study guides, 199 spaced-repetition flashcards, two 40-question practice exams, domain quizzes, and seven coding exercises. Your progress stays in your browser, with JSON backup and restore.
 
 **This is an unmaintained educational snapshot.** No future fixes, dependency updates, curriculum updates, or support responses are promised. It is designed for one person on a trusted computer, not public hosting. Forks and adaptations are welcome under the [ISC license](LICENSE).
 
-The content follows the historical Cisco DevNet Associate 200-901 v1.1 curriculum. Cisco now calls the certification **CCNA Automation**; check [Cisco's current course and exam information](https://www.cisco.com/site/us/en/learn/training-certifications/training/courses/ccnaauto.html) before planning an exam. StudyLab is independent material, not an official Cisco product or a guarantee of current exam coverage or passing results.
+The content follows the historical Cisco DevNet Associate 200-901 v1.1 curriculum. Cisco now calls the certification **CCNA Automation**; check [Cisco's current course and exam information](https://www.cisco.com/site/us/en/learn/training-certifications/training/courses/ccnaauto.html) before planning an exam. CCNA Automation Study Prep is independent material, not an official Cisco product or a guarantee of current exam coverage or passing results.
 
 ## Download and run
 
-1. Download **[devnet-studylab-1.0.0.zip](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases/download/v1.0.0/devnet-studylab-1.0.0.zip)** from the [published v1.0.0 release](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases/tag/v1.0.0), then extract it. GitHub's automatically generated **Source code** ZIP is a developer download and needs a build.
+1. Download **[ccna-automation-study-prep-1.0.1.zip](https://github.com/E-Conners-Lab/ccna-automation-study-prep/releases/download/v1.0.1/ccna-automation-study-prep-1.0.1.zip)** from the [published v1.0.1 release](https://github.com/E-Conners-Lab/ccna-automation-study-prep/releases/tag/v1.0.1), then extract it. GitHub's automatically generated **Source code** ZIP is a developer download and needs a build.
 2. Install [Node.js](https://nodejs.org/en/download) **24.21.0 or later within the 24.x series**. Use an up-to-date supported browser.
 3. Open a terminal in the extracted release folder and run:
 
@@ -20,7 +20,7 @@ The content follows the historical Cisco DevNet Associate 200-901 v1.1 curriculu
 
 The prebuilt release needs **no npm install, database, Docker, account, or API key**. The launcher serves bundled files only on your computer. Use the exact address above: `localhost` is intentionally not an alias.
 
-See [SETUP.md](SETUP.md) for source builds, backups, optional AI setup, and troubleshooting. The [published release notes](https://github.com/E-Conners-Lab/DevNet_StudyLab/releases/tag/v1.0.0) record the final verification results and link to the passing CI and CodeQL runs. The [release review](docs/RELEASE_REVIEW.md) is the earlier preparation record; its pending-publication checklist is superseded by those release notes.
+See [SETUP.md](SETUP.md) for source builds, backups, optional AI setup, and troubleshooting. The [published release notes](https://github.com/E-Conners-Lab/ccna-automation-study-prep/releases/tag/v1.0.1) record the final verification results and link to the passing CI and CodeQL runs. The [release review](docs/RELEASE_REVIEW.md) is the earlier preparation record; its pending-publication checklist is superseded by those release notes.
 
 Release verification covered macOS ARM64 and Ubuntu with Chromium/Chrome, including the packaged app and browser Python runner. Windows, Firefox, and Safari have not been tested. A live Anthropic tutor connectivity check passed; it does not establish comprehensive AI answer quality or safety.
 
@@ -42,6 +42,9 @@ The tutor is optional and uses **your own Anthropic account**, API key, and mode
 Only submitted chat and its conversation context are sent to Anthropic. The key stays in the local launcher; never paste it into the app, a lab, or a backup. Conversations stay in memory and disappear on reload. AI responses can be wrong, and future provider/model availability is not guaranteed. All other study tools work without it.
 
 ## Keep your work
+
+Previously released as **DevNet StudyLab**. Version 1.0.1 updates the name and packaging; existing browser progress and v1.0.0 backups remain compatible when using the same browser profile and local address. The curriculum remains the historical snapshot described above.
+
 
 Progress is specific to the browser profile and `127.0.0.1:4318` origin. Clearing browser data, using private browsing, or switching browsers/computers can lose it. Use **Settings → Export progress** regularly. Imports replace current progress after validation; export first if you want to keep both versions. Backups include lab drafts, so treat them as your personal files.
 

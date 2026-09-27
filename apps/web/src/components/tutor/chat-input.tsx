@@ -64,7 +64,7 @@ export function ChatInput({
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about DevNet topics..."
+            placeholder="Ask about automation topics..."
             rows={1}
             maxLength={4000}
             aria-label="Message to AI tutor"

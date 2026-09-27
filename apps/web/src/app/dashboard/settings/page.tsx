@@ -15,7 +15,7 @@ export default function SettingsPage() {
   const download = () => perform(() => {
     const url = URL.createObjectURL(new Blob([exportStudyProgress()], { type: "application/json" }));
     const link = document.createElement("a");
-    link.href = url; link.download = "devnet-study-progress.json"; link.click();
+    link.href = url; link.download = "ccna-automation-study-progress.json"; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }, "Backup downloaded.");
   const readBackup = async (file?: File) => {

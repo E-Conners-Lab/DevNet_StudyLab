@@ -1,5 +1,7 @@
 "use client";
 
+import { APP_NAME } from "@/lib/product";
+
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { StorageNotice } from "@/components/dashboard/storage-notice";
@@ -38,11 +40,11 @@ export default function DashboardLayout({
               <span className="sr-only">Open menu</span>
             </Button>
           </SheetTrigger>
-          <div className="flex items-center gap-2">
-            <div className="flex h-7 w-7 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-500">
+          <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-500">
               <TerminalSquare className="h-4 w-4" />
             </div>
-            <span className="text-sm font-bold text-zinc-50">DevNet StudyLab</span>
+            <span className="text-sm leading-tight font-bold text-zinc-50">{APP_NAME}</span>
           </div>
         </div>
         <SheetContent

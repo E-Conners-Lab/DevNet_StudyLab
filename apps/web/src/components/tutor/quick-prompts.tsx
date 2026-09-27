@@ -41,10 +41,10 @@ export function QuickPrompts({ onSelect }: QuickPromptsProps) {
           <Bot className="h-7 w-7 text-emerald-500" />
         </div>
         <h2 className="text-lg font-semibold text-zinc-200">
-          DevNet AI Tutor
+          Automation AI Tutor
         </h2>
         <p className="text-sm text-zinc-500 max-w-md">
-          Ask me anything about the Cisco DevNet Associate 200-901 exam.
+          Explore networking, Python, APIs, and automation concepts.
           I can explain concepts, provide code examples, and quiz you.
         </p>
       </div>

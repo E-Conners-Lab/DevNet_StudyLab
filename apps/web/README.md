@@ -1,4 +1,4 @@
-# StudyLab browser application
+# CCNA Automation Study Prep browser application
 
 This folder contains the React/Next.js source for the final local edition. Next.js statically exports the UI; the downloadable app is served by the small Node loopback runtime, not a Next.js server. Accounts, database access, and server-side lab execution have been removed from the supported edition.
 

@@ -192,7 +192,7 @@ export default function FlashcardsPage() {
             Flashcards
           </h1>
           <p className="text-sm text-zinc-500 mt-1">
-            SM-2 spaced repetition to master DevNet concepts &mdash;{" "}
+            SM-2 spaced repetition to master network automation concepts &mdash;{" "}
             <span className="text-emerald-400 font-medium">{stats.total}</span>{" "}
             cards across 6 domains
           </p>

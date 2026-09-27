@@ -1,6 +1,6 @@
 # Architecture — final local edition
 
-StudyLab is a static browser learning application plus a small loopback launcher. Next.js/React are build tools and UI infrastructure; **Next.js is not the installed application's server**. The release requires Node 24.21.0 or later in 24.x, with no installed npm dependencies at runtime.
+CCNA Automation Study Prep is a static browser learning application plus a small loopback launcher. Next.js/React are build tools and UI infrastructure; **Next.js is not the installed application's server**. The release requires Node 24.21.0 or later in 24.x, with no installed npm dependencies at runtime.
 
 ```text
 Browser: 127.0.0.1:4318

@@ -31,7 +31,7 @@ export async function createStudyServers({webRoot,runnerRoot,port=4318,runnerPor
     if(pathname!=='/api/v1/tutor') throw new HttpError(404,'Resource not found.');
     method(req,res,'POST');const session=sessions.authorize(req);
     const prompt=validatePrompt(await readJson(req));
-    if(!config.configured) throw new HttpError(503,'AI tutoring is optional and not configured. Set your local TUTOR_ANTHROPIC_KEY and TUTOR_MODEL, then restart StudyLab.');
+    if(!config.configured) throw new HttpError(503,'AI tutoring is optional and not configured. Set your local TUTOR_ANTHROPIC_KEY and TUTOR_MODEL, then restart the study app.');
     sessions.charge(session,res);
     const correlationId=randomUUID();
     const controller=new AbortController();
@@ -48,7 +48,7 @@ export async function createStudyServers({webRoot,runnerRoot,port=4318,runnerPor
       commonHeaders(res);
       try {
         const ownOrigin=runner?runnerOrigin:origin;
-        if(req.headers.host !== new URL(ownOrigin).host) throw new HttpError(403,'Use the exact local StudyLab address printed by the launcher.');
+        if(req.headers.host !== new URL(ownOrigin).host) throw new HttpError(403,'Use the exact local study app address printed by the launcher.');
         const pathname=req.url.split('?')[0];
         if(!runner&&pathname.startsWith('/api/')) await studyApi(req,res,pathname);
         else await serveStatic(req,res,{files:runner?runnerFiles:studyFiles,runner,studyOrigin:origin,runnerOrigin,styleHashes});
