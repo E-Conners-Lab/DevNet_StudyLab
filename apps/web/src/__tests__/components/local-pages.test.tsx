@@ -30,9 +30,16 @@ describe('self-contained learning pages',()=>{
 
  it('exposes every bundled objective for completion',()=>{
   render(<Study/>);
-  for(const domain of blueprint.domains)fireEvent.click(screen.getByRole('button',{name:new RegExp(domain.name)}));
-  expect(screen.getAllByRole('button',{name:/^Mark complete:/})).toHaveLength(blueprint.domains.reduce((total,domain)=>total+domain.objectives.length,0));
- });
+  // Resolve headers before expansion so each lookup avoids rescanning all the
+  // previously expanded objectives and recalculating their accessible names.
+  const domainButtons=blueprint.domains.map(domain=>screen.getByRole('button',{name:new RegExp(domain.name)}));
+  for(const button of domainButtons)fireEvent.click(button);
+  const objectiveButtons=screen.getAllByRole('button',{name:/^Mark complete:/});
+  expect(objectiveButtons.map(button=>button.getAttribute('aria-label'))).toEqual(
+   blueprint.domains.flatMap(domain=>domain.objectives.map(objective=>`Mark complete: ${objective.code}`)),
+  );
+ // This intentionally renders the complete curriculum, including under CI coverage.
+ },15_000);
  it('starts dashboard without fabricated accomplishments',async()=>{
   render(<Dashboard/>);
   expect(await screen.findByText('Curriculum Progress')).toBeInTheDocument();

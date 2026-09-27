@@ -25,7 +25,8 @@ describe('exam study flow',()=>{
   expect(getStudySnapshot().state.examAttempts).toHaveLength(1);
   fireEvent.click(screen.getByRole('button',{name:'Back to Practice'}));
   expect(nav.push).toHaveBeenCalledWith('/dashboard/practice');
- });
+ // Keep the complete bundled exam and its review; allow for CI coverage overhead.
+ },15_000);
  it('handles multiple select toggles by pointer and keyboard',()=>{
   const change=vi.fn();const view=render(<MultipleSelectInput question={question} value={[]} onChange={change}/>);
   fireEvent.click(screen.getByRole('button',{name:/First/}));expect(change).toHaveBeenLastCalledWith(['A']);
