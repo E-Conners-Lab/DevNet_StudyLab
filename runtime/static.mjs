@@ -40,7 +40,8 @@ export async function collectStyleHashes(files) {
 }
 function studyHtml(source, runnerOrigin, styles) {
   const nonce = randomBytes(24).toString('base64');
-  const attrs = [...source.matchAll(/\sstyle="([^"]*)"/g)].map(match => match[1].replace(/&quot;/g,'"').replace(/&amp;/g,'&').replace(/&#x27;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>'));
+  // Decode ampersands last so nested entity text is decoded only once.
+  const attrs = [...source.matchAll(/\sstyle="([^"]*)"/g)].map(match => match[1].replace(/&quot;/g,'"').replace(/&#x27;/g,"'").replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&amp;/g,'&'));
   const hashes = [...new Set(attrs.map(value=>`'sha256-${createHash('sha256').update(value).digest('base64')}'`))];
   // Hydration/navigation may recreate built-in styles from another static page.
   const csp = `default-src 'none'; script-src 'nonce-${nonce}' 'strict-dynamic'; style-src 'self' 'nonce-${nonce}' ${[...new Set(styles)].join(' ')}; style-src-attr ${hashes.length ? "'unsafe-hashes' " + hashes.join(' ') : "'none'"}; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src ${runnerOrigin}; worker-src 'none'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'`;

@@ -1,10 +1,28 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, writeFile, mkdir } from 'node:fs/promises';
+import { mkdtemp, writeFile, mkdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { request as httpRequest } from 'node:http';
+import { createHash } from 'node:crypto';
 import { createStudyServers } from '../server.mjs';
+import { serveStatic } from '../static.mjs';
+
+test('style CSP hashes decode HTML entities once without changing served markup', async t => {
+ const root=await mkdtemp(path.join(tmpdir(),'studylab-style-entities-'));
+ t.after(()=>rm(root,{recursive:true,force:true}));
+ const file=path.join(root,'index.html');
+ const encoded='font-family:&amp;lt;&amp;gt;&amp;#x27;&amp;quot; &quot;quoted&quot; &lt;&gt;&#x27;';
+ const decoded='font-family:&lt;&gt;&#x27;&quot; "quoted" <>\'';
+ const html=`<html><head></head><body><span style="${encoded}">Study</span></body></html>`;
+ await writeFile(file,html);
+ const headers=new Map();let body;
+ const res={setHeader:(key,value)=>headers.set(key,value),writeHead:()=>{},end:value=>{body=value.toString();}};
+ await serveStatic({method:'GET',url:'/'},res,{files:new Map([['/index.html',file]]),runnerOrigin:'http://127.0.0.1:4319'});
+ const expected=createHash('sha256').update(decoded).digest('base64');
+ assert.ok(headers.get('Content-Security-Policy').includes(`'sha256-${expected}'`));
+ assert.ok(body.includes(`style="${encoded}"`));
+});
 
 async function fixture(t, options = {}) {
   const root = await mkdtemp(path.join(tmpdir(), 'studylab-server-'));

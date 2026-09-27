@@ -14,13 +14,15 @@ Local package verification passed. This document records the local preparation e
 - Bundled Pyodide and the required Python packages with pinned hashes, sizes, upstream notices and source references. Five lab solutions execute in the browser. The shell/network exercises remain explicitly download-only.
 - Retained optional AI with a local server-held key and user-selected model. The gateway enforces exact Host/Origin, session-bound CSRF, allowed methods, request/output limits, quotas, timeout, fixed HTTPS vendor destination and generic errors. The model has no tools.
 - Added a prebuilt ZIP, file integrity manifest, archive checksum, JavaScript SBOM and third-party notices. The learner needs Node 24.21.0 or later within 24.x; no npm install, database or Docker is required.
-- Replaced CI with pinned, least-privilege build/test/audit/secret-scan checks and a CodeQL workflow. Workflows are source changes until run on GitHub.
+- Replaced CI with pinned, least-privilege build/test/audit/secret-scan checks and a CodeQL workflow. GitHub Ubuntu verification and CodeQL have run on the signed initial release commit.
 
 ## Findings fixed during review
 
 The former server-side arbitrary-code execution paths and publicly bound service stack were removed from the supported source. The new implementation's independent review found four additional defects: concurrent requests could reuse a stale tutor quota counter; prompt redaction missed common credential formats; two browser tabs could overwrite progress silently; a long tutor answer could exceed the next request’s history-message limit. Regression tests reproduced these, and all were fixed. Review also removed an ignored generated documentation manifest from packaging because it contained an absolute development path and obsolete endpoints.
 
 Production browser checks caught missing preload nonces and dynamically recreated component styles. CSP permits trusted scripts with fresh nonces and exact built-style hashes, rather than broad script evaluation or arbitrary inline script execution. The native editor and all four packaged browser journeys pass with no CSP violations.
+
+The first main-branch CodeQL baseline identified nested HTML entity double-decoding while calculating CSP style hashes. The result feeds only SHA-256, not rendered HTML; all 103 attributes in the existing 25-page package matched an HTML parser, but the general correctness edge case was fixed with a failing-then-passing regression. A separate dedicated-worker origin warning was reviewed as a false positive: the private worker channel is behind the exact-origin and parent-source checks in `frame.mjs`.
 
 ## Recorded verification
 
@@ -30,7 +32,7 @@ Production browser checks caught missing preload nonces and dynamically recreate
 | Dependency advisories | Root and complete web lock trees reported zero npm advisories at review time; repeat against the final commit |
 | UI unit/integration suite | 97 tests passed; 89.25% statements, 81.11% branches, 87.87% functions, 91.29% lines at latest measured run |
 | Content validation | 23 tests passed |
-| Runtime, packaging and deterministic AI suite | 65 tests passed; latest measured runtime coverage 97.94% lines, 91.99% branches, 89.19% functions |
+| Runtime, packaging and deterministic AI suite | 66 tests passed; latest measured runtime coverage 97.94% lines, 92.41% branches, 91.89% functions |
 | Browser Python boundary | Real Chromium checks passed for Python/YAML/Jinja, blocked parent/external network, no host filesystem/DOM/storage, blocked child workers, timeout, cancellation, output cap and recovery |
 | Bundled lab solutions | Five supported solution files executed successfully in the browser |
 | Packaged UI | Four main user journeys passed with strict CSP checks; no outside-origin requests during the core study/backup flow |
@@ -42,7 +44,7 @@ Production browser checks caught missing preload nonces and dynamically recreate
 
 Coverage includes application TS/TSX and local data logic, excluding test files, generated type declarations and unchanged UI-library wrappers. Node coverage includes runtime modules and the asset downloader; the CLI entry is exercised by packaged browser tests. The iframe/worker modules are exercised in real-browser boundary tests, not included in Node line-coverage percentages. Do not interpret these percentages as every distributed dependency or every browser execution path being covered.
 
-Local verification used macOS ARM64, Node 24.21.0 and Chromium/Chrome. Windows, Linux, Firefox and Safari were not exercised in this session. The committed Ubuntu CI workflow is prepared but has not run remotely. Reproduce with `npm run test:coverage --prefix apps/web`, `npm run test:content --prefix apps/web`, `npm run test:runtime`, `npm run release:build`, `npm run test:e2e --prefix apps/web`, `npm run test:sandbox` and `npm run test:tutor-browser` after installing the Playwright browser as described in SETUP.md.
+Local verification used macOS ARM64, Node 24.21.0 and Chromium/Chrome. GitHub Ubuntu CI additionally passed the complete verification workflow. Windows, Firefox and Safari were not exercised in this session. Reproduce with `npm run test:coverage --prefix apps/web`, `npm run test:content --prefix apps/web`, `npm run test:runtime`, `npm run release:build`, `npm run test:e2e --prefix apps/web`, `npm run test:sandbox` and `npm run test:tutor-browser` after installing the Playwright browser as described in SETUP.md.
 
 ## Security-control applicability
 
@@ -61,16 +63,20 @@ Local verification used macOS ARM64, Node 24.21.0 and Chromium/Chrome. Windows, 
 | SEC-29,30 | Exact versions, committed lockfiles, dependency audits in CI; bundled Python bytes verified against a pinned manifest. No ongoing update service is promised. |
 | SEC-31 | N/A: no container/Kubernetes release. JavaScript SBOM and Python manifest/notices are included. Local checksums detect accidental corruption; they are not a publisher signature or hosted build attestation. |
 | SEC-32 | Loopback, unprivileged ports, no shell execution; CI read-only by default, CodeQL grants security upload only for its job. |
-| SEC-34 | **Pending remote gate:** required review, signed commits, no force-push/admin bypass on release branches. Current main is unprotected. |
-| SEC-35 | **Pending remote gate:** verify/enable push protection and a required CodeQL high/critical findings gate, and run CI for the final release commit. Workflow files alone do not enforce branch rules. |
+| SEC-34 | **Enabled and verified:** an active ruleset covers main and release branches, requiring independent review, signed commits and checks, blocking force pushes and deletion, with no bypass actors. Version tags are immutable. |
+| SEC-35 | **Enabled and verified:** secret scanning, push protection, required CI and CodeQL, and a CodeQL high/critical findings merge gate. CI uses read-only defaults and an exact-SHA action allowlist. The final decoder correction still requires independent review and passing checks before publication. |
 | SEC-19 (legacy) | No directory listing; static files are inventoried and paths/methods constrained. |
 | AI-1,2,3,4 | Untrusted message roles/boundaries, no model tools, best-effort redaction, versioned deterministic evaluation gate and redacted transport metadata. See AI_EVALUATION.md for the explicit live-model evidence gap and chosen-model procedure. No default model is distributed. |
+
+## Final publication status
+
+The repository is public and the initial release was merged through PR #1 as GitHub-verified signed commit `75cd1335003a4137f508a651f71e79254435b2ef`. GitHub dependency alerts cleared after that merge. CI and CodeQL ran on this commit. The final CSP decoder correction must receive independent GitHub approval under the active protection before its signed merge, final build and release publication. No release asset has been published yet.
 
 ## Public GitHub release gates
 
 1. Review and commit the final source through a reviewed pull request and GitHub-signed squash merge. No personal signing credentials are created.
 2. Run CI and CodeQL on that exact commit. Resolve high/critical findings and require the relevant checks.
-3. Configure protected main/release branches with required human review, signed commits, blocked force pushes and no admin bypass. Verify secret scanning and push protection. The read-only remote check reported private visibility and unprotected main; unavailable security settings were not treated as enabled.
+3. Configure protected main/release branches with required human review, signed commits, blocked force pushes and no admin bypass. Verify secret scanning and push protection. Read back active rules and security settings again at publication time; do not infer enforcement merely from committed workflow files.
 4. Publish the verified prebuilt ZIP and its SHA256SUMS alongside a tag pointing to the reviewed commit. Retain source, license notices and SBOM. GitHub's automatic source ZIP is not the ready-to-run asset.
 5. Confirm the no-maintenance notice is visible. If the owner chooses to archive the repository, do so only after the release and downloads are verified. Archiving is not yet performed or assumed.
 
